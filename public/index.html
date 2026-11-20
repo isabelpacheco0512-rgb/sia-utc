@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SIA · Universidad Tecnológica del Centro</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet">
+<script>(function(){var t=null;try{t=localStorage.getItem("tema")}catch(e){}if(!t)t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.dataset.tema=t})();</script>
+<style>
+:root{--azul:#CFE2FA;--azul-fuerte:#3B6FB6;--verde:#CDEFE0;--morado:#DDD3F5;--fondo:#F8F6FD;--tarjeta:#FFF;--tinta:#2E2B4F;--suave:#5C5A7A;--borde:#E3DFF1;--pista:#ECE9F7;--th:#F1EEFA;--kpi4:#E4EEF9;--hover:rgba(255,255,255,.55);--ok-tx:#1D5A41;--baja-bg:#F3E6C9;--baja-tx:#7A4A06;--aviso-tx:#1F4A80;--bi:#BDB6DA;--bh:#BDE6D3;--titulos:"Source Serif 4",Georgia,"Times New Roman",serif;--texto:"Source Sans 3","Segoe UI",system-ui,sans-serif}
+:root[data-tema=dark]{--azul:#3F5F9E;--azul-fuerte:#B5D3FA;--verde:#2A664F;--morado:#4A3F88;--fondo:#2D2A55;--tarjeta:#3B3770;--tinta:#F4F1FF;--suave:#E3E0F6;--borde:#54508A;--pista:#54508A;--th:#46427F;--kpi4:#3C5E94;--hover:rgba(255,255,255,.16);--ok-tx:#D6F5E6;--baja-bg:#6B5522;--baja-tx:#FFE9B8;--aviso-tx:#E4EFFF;--bi:#8C88C0;--bh:#348064;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;font-family:var(--texto);background:var(--fondo);color:var(--tinta);line-height:1.5}
+[hidden]{display:none!important}.app{display:flex;min-height:100vh}
+aside{width:250px;flex:none;background:var(--morado);padding:28px 16px;display:flex;flex-direction:column;gap:6px;border-right:1px solid var(--borde)}
+.marca{padding:0 12px 20px}.marca h1{font-family:var(--titulos);font-size:32px;letter-spacing:.06em;margin:0;line-height:1}.marca p{margin:4px 0 0;font-size:14px;color:var(--suave)}
+nav button{all:unset;display:block;width:100%;box-sizing:border-box;padding:11px 14px;border-radius:6px;cursor:pointer;font-size:15px}
+nav button:hover{background:var(--hover)}nav button[aria-current=page]{background:var(--tarjeta);font-weight:700;box-shadow:inset 4px 0 0 var(--azul-fuerte)}
+:focus-visible{outline:3px solid var(--azul-fuerte);outline-offset:2px}
+.tema{margin:12px 12px 0;background:var(--tarjeta)!important}.pie{margin-top:auto;padding:14px 12px 0;font-size:14px;color:var(--suave)}
+main{flex:1;padding:32px 40px;min-width:0}
+.login{min-height:100vh;display:grid;grid-template-columns:1fr 1fr}.login-lado{background:var(--morado);padding:56px;display:flex;flex-direction:column;justify-content:center;gap:16px}
+.login-lado h1{font-family:var(--titulos);font-size:60px;letter-spacing:.06em;margin:0;line-height:1}.login-lado p{margin:0;font-size:18px;max-width:380px}
+.mods{display:flex;flex-wrap:wrap;gap:10px}.mods span{padding:7px 14px;border-radius:4px;font-weight:600;font-size:13px;letter-spacing:.03em;background:var(--azul)}.mods span:nth-child(2){background:var(--verde)}.mods span:nth-child(3){background:var(--tarjeta)}
+.login-form{display:flex;align-items:center;justify-content:center;padding:32px}.login-form form{width:100%;max-width:400px;display:flex;flex-direction:column;gap:16px}.login-form h2{font-size:30px}.login-form .btn{width:100%}
+.err{color:#B3261E;font-weight:700;font-size:14px;min-height:20px;margin:0}:root[data-tema=dark] .err{color:#FFB4AB}
+.enlace{color:var(--azul-fuerte);font-size:14px;cursor:pointer;background:none;border:0;padding:0;text-align:left;font-family:inherit;text-decoration:underline}
+h2{font-family:var(--titulos);font-size:30px;font-weight:700;margin:0;line-height:1.2}h3{font-family:var(--titulos);margin:0 0 14px;font-size:18px}.sub{color:var(--suave);font-size:15px}
+.cabecera{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}.mt{margin:24px 0 16px}
+.btn{border:0;border-radius:6px;padding:10px 20px;min-height:44px;font:600 15px var(--texto);color:var(--tinta);background:var(--verde);cursor:pointer}.btn:hover{background:var(--bh)}
+.btn.sec{background:var(--azul)}.btn.chico{min-height:34px;padding:4px 12px;font-size:14px}
+.tarjeta{background:var(--tarjeta);border:1px solid var(--borde);border-radius:8px;padding:22px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:24px 0 16px}.kpi{border-radius:8px;padding:20px;background:var(--azul)}.kpi:nth-child(2){background:var(--verde)}.kpi:nth-child(3){background:var(--morado)}.kpi:nth-child(4){background:var(--kpi4)}
+.kpi span{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--suave)}.kpi b{display:block;font-family:var(--titulos);font-size:34px;line-height:1.2}
+.dos{display:grid;grid-template-columns:3fr 2fr;gap:16px;align-items:start}.insc{display:grid;grid-template-columns:3fr 1.2fr;gap:16px;align-items:start}.resumen{position:sticky;top:24px;display:flex;flex-direction:column;gap:14px}
+.resumen dl{margin:0;display:grid;grid-template-columns:1fr auto;gap:8px 12px;font-size:15px}.resumen dt{color:var(--suave)}.resumen dd{margin:0;font-weight:700;text-align:right}
+.barra{margin-bottom:16px}.barra div:first-child{display:flex;justify-content:space-between;font-size:15px;margin-bottom:6px}.pista{height:10px;border-radius:2px;background:var(--pista)}.pista i{display:block;height:10px;border-radius:2px;background:#8FB8EC}
+.lista{list-style:none;margin:0;padding:0}.lista li{padding:10px 0;border-top:1px solid var(--borde);font-size:15px}
+.filtros{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}.grow{flex:1;min-width:220px}
+label{display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--suave)}
+input,select{min-height:44px;border:1px solid var(--bi);border-radius:6px;padding:0 14px;font:16px var(--texto);background:var(--tarjeta);color:var(--tinta)}
+input[type=checkbox]{min-height:0;width:22px;height:22px;accent-color:#6247AA}.nota{width:84px;text-align:center;padding:0}.nota.mal{border-color:#B3261E;border-width:2px}
+.tabla{overflow-x:auto;padding:0}table{width:100%;border-collapse:collapse}th{background:var(--th);text-align:left;padding:12px 16px;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--suave)}td{padding:12px 16px;border-top:1px solid var(--borde);font-size:15px}
+tr.sel td{background:var(--kpi4)}.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.chip{padding:3px 10px;border-radius:4px;font-size:12px;font-weight:600;background:var(--verde);color:var(--ok-tx)}.chip.baja,.chip.choque{background:var(--baja-bg);color:var(--baja-tx)}.chip.lleno{background:var(--pista);color:var(--suave)}
+.aviso{display:inline-block;background:var(--azul);color:var(--aviso-tx);padding:5px 12px;border-radius:4px;font-weight:600;font-size:13px}
+dialog{border:1px solid var(--borde);border-radius:8px;background:var(--tarjeta);color:var(--tinta);padding:24px;width:min(92%,480px)}dialog::backdrop{background:rgba(0,0,0,.45)}.fm{display:flex;flex-direction:column;gap:12px}
+#toast{position:fixed;right:24px;bottom:24px;background:var(--morado);color:var(--tinta);padding:14px 20px;border-radius:6px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s}#toast.ver{opacity:1}
+@media(max-width:820px){.login,.dos,.insc{grid-template-columns:1fr}.login-lado{padding:32px}.login-lado h1{font-size:44px}.resumen{position:static}.app{flex-direction:column}aside{width:auto;padding:16px}nav{display:flex;flex-wrap:wrap;gap:6px}nav button{width:auto}.pie{display:none}main{padding:24px 16px}h2{font-size:26px}}
+@media(prefers-reduced-motion:reduce){#toast{transition:none}}
+
+/* Diseño v2: barra superior, tarjetas con filo de color, tablas en bandas */
+:root{--k1:#3B6FB6;--k2:#2F7D5E;--k3:#6247AA;--k4:#8FB8EC;--sombra:0 1px 3px rgba(46,43,79,.14)}
+:root[data-tema=dark]{--k1:#B5D3FA;--k2:#5FBF97;--k3:#B7A7F2;--k4:#8FB8EC;--sombra:0 1px 3px rgba(0,0,0,.4)}
+.top{background:var(--morado);border-bottom:1px solid var(--borde);display:flex;align-items:center;gap:28px;padding:0 32px;min-height:68px;flex-wrap:wrap;position:sticky;top:0;z-index:5}
+.top .marca{padding:10px 0;display:flex;align-items:baseline;gap:12px}.top .marca h1{font-size:28px}.top .marca p{margin:0;font-size:13px}
+.top nav{display:flex;gap:2px;flex:1;flex-wrap:wrap}
+.top nav button{width:auto;padding:24px 14px 20px;border-radius:0;border-bottom:4px solid transparent;font-weight:600}
+.top nav button:hover{background:var(--hover)}.top nav button[aria-current=page]{background:none;box-shadow:none;border-bottom-color:var(--k1);font-weight:700}
+.usr{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--suave)}
+main{max-width:1180px;margin:0 auto;padding:32px;width:100%}
+.pie{display:block;text-align:center;padding:24px;margin:0;font-size:13px;color:var(--suave)}
+.cabecera{border-bottom:2px solid var(--borde);padding-bottom:16px}
+.tarjeta,.kpi{border:0;border-top:4px solid var(--k1);border-radius:4px;box-shadow:var(--sombra)}.tabla{border-top-color:var(--k3)}
+.kpi{background:var(--tarjeta)!important}.kpi:nth-child(2){border-top-color:var(--k2)}.kpi:nth-child(3){border-top-color:var(--k3)}.kpi:nth-child(4){border-top-color:var(--k4)}
+th{background:var(--morado);color:var(--tinta)}tbody tr:nth-child(even) td{background:var(--th)}tr.sel td{background:var(--kpi4)!important}
+.btn,input,select,dialog{border-radius:3px}
+.login{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;background:linear-gradient(var(--morado) 0,var(--morado) 46%,var(--fondo) 46%)}
+.login-lado{background:none;padding:0 0 28px;text-align:center;align-items:center}.login-lado p{max-width:460px}.mods{justify-content:center}
+.login-form{background:var(--tarjeta);border-top:4px solid var(--k1);border-radius:4px;box-shadow:var(--sombra);width:min(100%,440px);padding:32px}.login-form form{max-width:none}
+@media(max-width:820px){.top{padding:0 16px;gap:6px}.top nav button{padding:12px 10px}.usr{width:100%;justify-content:space-between;padding-bottom:10px}main{padding:20px 16px}}
+/* Evaluación docente */
+dialog.ancho{width:min(94%,720px);max-height:90vh;overflow:auto}
+.evgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}.evpie{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:16px}
+fieldset.preg{border:0;border-top:1px solid var(--borde);padding:12px 0 0;margin:0}.preg legend{padding:0;font-size:15px;color:var(--tinta);font-weight:600}
+.esc{display:flex;gap:8px;margin-top:8px}.esc label.op{position:relative;flex-direction:row;cursor:pointer}.esc input{position:absolute;opacity:0;width:44px;height:44px;margin:0;cursor:pointer}
+.esc span{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border:1px solid var(--bi);border-radius:3px;background:var(--tarjeta);color:var(--tinta);font-weight:700}
+.esc input:checked+span{background:var(--k1);border-color:var(--k1);color:var(--tarjeta)}.esc input:focus-visible+span{outline:3px solid var(--azul-fuerte);outline-offset:2px}
+textarea{border:1px solid var(--bi);border-radius:3px;padding:10px 14px;font:16px var(--texto);background:var(--tarjeta);color:var(--tinta);resize:vertical}
+</style></head><body>
+<div class="login" id="login"><div class="login-lado"><h1>SIA</h1><p>Sistema de Información Académico de la Universidad Tecnológica del Centro.</p><div class="mods"><span>Alumnos</span><span>Inscripciones</span><span>Calificaciones</span><span>Reportes</span></div></div>
+<div class="login-form"><form data-f="login" novalidate><h2>Iniciar sesión</h2>
+<label>Correo o matrícula<input id="usuario" autocomplete="username" placeholder="Ej. tunombre@gmail.com"></label>
+<label>Contraseña<input id="clave" type="password" autocomplete="current-password"></label>
+<p class="err" id="loginError" role="alert"></p><button class="btn">Iniciar sesión</button>
+<button type="button" class="enlace" data-a="aviso" data-t="Se enviará un enlace de recuperación a tu correo institucional">¿Olvidaste tu contraseña?</button>
+<p class="sub" style="margin:0">¿Primera vez en el SIA? <button type="button" class="enlace" data-a="verRegistro">Crea tu cuenta</button></p></form>
+<form data-f="registro" id="formRegistro" novalidate hidden><h2>Crear cuenta</h2>
+<p class="sub" style="margin:0">Puedes usar tu Gmail, Outlook o cualquier correo. Te enviaremos un enlace para activar tu cuenta.</p>
+<label>Soy<select name="tipo" id="regTipo" data-c="regTipo"><option value="ALUMNO">Alumno</option><option value="DOCENTE">Docente</option></select></label>
+<label><span id="regIdTx">Matrícula</span><input name="identificador" id="regId" autocomplete="off" placeholder="Ej. UTC2026002"></label>
+<label>Correo electrónico<input name="correo" type="email" autocomplete="email" placeholder="Ej. tunombre@gmail.com"></label>
+<label>Contraseña<input name="password" type="password" autocomplete="new-password" aria-describedby="regReglas"></label>
+<label>Confirmar contraseña<input name="password2" type="password" autocomplete="new-password"></label>
+<p class="sub" id="regReglas" style="margin:0">Mínimo 8 caracteres, con al menos una letra y un número.</p>
+<p class="err" id="regError" role="alert"></p><button class="btn">Crear cuenta</button>
+<p class="sub" style="margin:0">¿Ya tienes cuenta? <button type="button" class="enlace" data-a="verLogin">Inicia sesión</button></p></form>
+<div id="regListo" hidden style="width:100%;display:flex;flex-direction:column;gap:14px"><h2>Revisa tu correo</h2>
+<p style="margin:0">Te enviamos un enlace de activación a <b id="regCorreo"></b>. Ábrelo para activar tu cuenta y después inicia sesión.</p>
+<p class="sub" style="margin:0">El enlace vence en 24 horas. Si no lo ves, busca en Spam o Promociones.</p>
+<p class="err" id="reenvioMsg" role="status" style="color:var(--suave)"></p>
+<button type="button" class="btn sec" data-a="reenviar">Reenviar correo</button>
+<button type="button" class="enlace" data-a="verLogin">Volver a iniciar sesión</button></div></div></div>
+<div id="app" hidden><header class="top"><div class="marca"><h1>SIA</h1><p>Universidad Tecnológica del Centro</p></div><nav aria-label="Módulos" id="nav"></nav>
+<div class="usr"><span id="sesion"></span><button class="btn chico sec" id="tema" data-a="tema" aria-pressed="false">Modo oscuro</button><button class="btn chico" data-a="salir">Cerrar sesión</button></div></header>
+<main id="main"></main><footer class="pie">Control escolar · Sistema de Información Académico</footer></div>
+<dialog id="dlg"></dialog><div id="toast" role="status"></div>
+<script>
+const K="sia_db_v2",$=s=>document.querySelector(s),L=(a,f)=>a.map(f).join(""),esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const opt=(v,l,s)=>`<option value="${esc(v)}"${v==s?" selected":""}>${esc(l)}</option>`;
+let db=null,TOKEN=null;
+async function api(ruta,met="GET",cuerpo){
+const r=await fetch("/api/"+ruta,{method:met,headers:{"Content-Type":"application/json",...(TOKEN?{Authorization:"Bearer "+TOKEN}:{})},body:cuerpo?JSON.stringify(cuerpo):undefined});
+const d=await r.json().catch(()=>({}));
+if(!r.ok){if(r.status==401&&TOKEN){act.salir();aviso("Tu sesión venció. Inicia sesión de nuevo.")}throw new Error(d.error||"Error del servidor")}
+return d}
+const cargar=async()=>{db=await api("datos")};
+const run=async(f,sel)=>{try{await f()}catch(e){const x=sel&&$(sel);x?x.textContent=e.message:aviso(e.message)}};
+const save=()=>{};
+let S=null,cur="panel";
+const by=(t,id)=>db[t].find(x=>x.id==id),nid=t=>Math.max(0,...db[t].map(x=>x.id))+1,nom=a=>a.nombres+" "+a.apellidos,hoy=()=>new Date().toISOString().slice(0,10);
+const log=()=>{};
+const aviso=t=>{const e=$("#toast");e.textContent=t;e.classList.add("ver");setTimeout(()=>e.classList.remove("ver"),2400)};
+const puede=(...r)=>r.includes(S.rol)||(aviso("Acceso denegado para tu rol"),false);
+const hor=g=>db.horarios.filter(h=>h.grupo_id==g.id),dias=g=>hor(g).map(h=>h.dia_semana).join("/"),hrs=g=>hor(g)[0]?hor(g)[0].hora_inicio+"–"+hor(g)[0].hora_fin:"";
+const choca=(a,b)=>a.some(x=>b.some(y=>x.dia_semana==y.dia_semana&&x.hora_inicio<y.hora_fin&&y.hora_inicio<x.hora_fin));
+const activas=g=>db.inscripciones.filter(i=>i.grupo_id==g.id&&i.estatus=="INSCRITO"),lugares=g=>g.cupo-activas(g).length;
+const cal=i=>db.calificaciones.find(c=>c.inscripcion_id==i.id);
+const prom=i=>{const c=cal(i);if(!c)return null;if(c.final!=null)return c.final;const v=[c.parcial1,c.parcial2].filter(x=>x!=null);return v.length?v.reduce((a,b)=>a+b)/v.length:null};
+const media=a=>{a=a.filter(x=>x!=null);return a.length?(a.reduce((x,y)=>x+y)/a.length).toFixed(1):"—"};
+const perAct=()=>db.periodos.at(-1);
+const insPer=p=>db.inscripciones.filter(i=>i.estatus=="INSCRITO"&&by("grupos",i.grupo_id).periodo_id==p);
+const tabla=(h,b)=>`<div class="tarjeta tabla"><table><thead><tr>${L(h,x=>`<th>${x}</th>`)}</tr></thead><tbody>${b}</tbody></table></div>`;
+const cab=(t,s,x="")=>`<div class="cabecera"><div><h2>${t}</h2><div class="sub">${s}</div></div>${x}</div>`;
+const NAV={ADMIN:[["panel","Panel"],["evaluacion","Evaluación docente"],["alumnos","Alumnos"],["inscripciones","Inscripciones"],["calificaciones","Calificaciones"],["horarios","Horarios"],["cargas","Cargas académicas"],["reportes","Reportes"],["catalogos","Catálogos"],["bitacora","Bitácora"]],DOCENTE:[["panel","Panel"],["evaluacion","Mi evaluación"],["calificaciones","Calificaciones"],["horarios","Horarios"]],ALUMNO:[["panel","Panel"],["evaluacion","Evaluación docente"],["calificaciones","Calificaciones"],["horarios","Horarios"]]};
+const V={},H={},act={},ch={},sub={};
+function ir(id){cur=id;document.querySelectorAll("nav button").forEach(b=>b.dataset.ir==id?b.setAttribute("aria-current","page"):b.removeAttribute("aria-current"));$("#main").innerHTML=V[id]();H[id]&&H[id]()}
+function abrir(h,ancho){$("#dlg").classList.toggle("ancho",!!ancho);$("#dlg").innerHTML=h;$("#dlg").showModal()}
+/* PANEL */
+V.panel=()=>{const p=perAct(),ip=insPer(p.id);let k,x="";
+if(S.rol=="ADMIN"){const al=db.alumnos.filter(a=>a.estatus=="ACTIVO"),c=ip.map(cal).filter(Boolean),llenas=c.reduce((t,r)=>t+[r.parcial1,r.parcial2,r.final].filter(v=>v!=null).length,0),tot=ip.length*3;
+k=[["Alumnos activos",al.length],["Inscripciones del periodo",ip.length],["Calificaciones capturadas",(tot?Math.round(llenas*100/tot):0)+"%"],["Grupos del periodo",db.grupos.filter(g=>g.periodo_id==p.id).length]];
+const sin=al.filter(a=>!ip.some(i=>i.alumno_id==a.id)).length,pend=tot-llenas,fu=db.grupos.filter(g=>g.periodo_id==p.id&&lugares(g)<=0).length;
+x=`<div class="dos"><div class="tarjeta"><h3>Avance de inscripciones por programa</h3>${L(db.programas,r=>{const a=al.filter(z=>z.programa_id==r.id),n=a.filter(z=>ip.some(i=>i.alumno_id==z.id)).length,v=a.length?Math.round(n*100/a.length):0;return`<div class="barra"><div><span>${esc(r.nombre)}</span><b>${v}%</b></div><div class="pista"><i style="width:${v}%"></i></div></div>`})}</div>
+<div class="tarjeta"><h3>Pendientes administrativos</h3><ul class="lista"><li>${sin} alumnos activos sin inscripción</li><li>${pend} calificaciones por capturar</li><li>${fu} grupos sin cupo</li></ul><h3 style="margin-top:18px">Bitácora reciente</h3><ul class="lista">${L(db.bitacora.slice(0,4),b=>`<li>${esc(b.a)}<div class="sub">${esc(b.f)} · ${esc(b.u)}</div></li>`)||"<li>Sin movimientos</li>"}</ul></div></div>`}
+else if(S.rol=="DOCENTE"){const gs=db.grupos.filter(g=>g.docente_id==S.u.docente_id),is=gs.flatMap(activas),v=is.reduce((t,i)=>t+[cal(i)?.parcial1,cal(i)?.parcial2].filter(z=>z==null).length,0);k=[["Mis grupos",gs.length],["Alumnos inscritos",is.length],["Parciales por capturar",v],["Promedio",media(is.map(prom))]]}
+else{const is=db.inscripciones.filter(i=>i.alumno_id==S.u.alumno_id&&i.estatus=="INSCRITO");k=[["Materias inscritas",is.length],["Créditos",is.reduce((t,i)=>t+by("materias",by("grupos",i.grupo_id).materia_id).creditos,0)],["Promedio",media(is.map(prom))],["Periodo",p.nombre]]}
+return cab("Panel general",`Periodo escolar ${esc(p.nombre)} · ${S.rol.toLowerCase()}`)+`<div class="kpis">${L(k,r=>`<div class="kpi"><span>${r[0]}</span><b>${r[1]}</b></div>`)}</div>`+x};
+/* ALUMNOS */
+V.alumnos=()=>cab("Alumnos","Alta, consulta, edición y baja lógica de expedientes",`<button class="btn" data-a="nuevoAl">Nuevo alumno</button>`)+`<div class="filtros mt"><label class="grow">Buscar por nombre o matrícula<input id="buscar" type="search" data-c="fAl" placeholder="Ej. UTC2026001"></label><label>Programa<select id="carrera" data-c="fAl"><option value="">Todos</option>${L(db.programas,p=>opt(p.id,p.nombre))}</select></label><label>Estatus<select id="estf" data-c="fAl"><option value="">Todos</option>${opt("ACTIVO","Activo")}${opt("INACTIVO","Inactivo")}</select></label></div>`+tabla(["Matrícula","Nombre","Correo","Programa","Estatus",""],`<tbody id="filas"></tbody>`).replace(/<tbody><tbody id="filas"><\/tbody><\/tbody>/,'<tbody id="filas"></tbody>');
+const pintarAl=()=>{const q=$("#buscar").value.toLowerCase(),c=$("#carrera").value,e=$("#estf").value;$("#filas").innerHTML=L(db.alumnos.filter(a=>(!c||a.programa_id==c)&&(!e||a.estatus==e)&&(a.matricula+" "+nom(a)).toLowerCase().includes(q)),a=>`<tr><td>${esc(a.matricula)}</td><td>${esc(nom(a))}</td><td>${esc(a.correo)}</td><td>${esc(by("programas",a.programa_id).clave)}</td><td><span class="chip ${a.estatus=="ACTIVO"?"":"baja"}">${a.estatus=="ACTIVO"?"Activo":"Inactivo"}</span></td><td><button class="btn chico sec" data-a="editAl" data-id="${a.id}">Editar</button> ${a.estatus=="ACTIVO"?`<button class="btn chico" data-a="bajaAl" data-id="${a.id}">Baja</button>`:""}</td></tr>`)||`<tr><td colspan="6">Sin resultados</td></tr>`};
+H.alumnos=pintarAl;ch.fAl=pintarAl;
+function formAl(a={}){abrir(`<form class="fm" data-f="al" data-id="${a.id||""}"><h3>${a.id?"Editar":"Nuevo"} alumno</h3><label>Matrícula<input name="matricula" value="${esc(a.matricula)}"></label><label>Nombres<input name="nombres" value="${esc(a.nombres)}"></label><label>Apellidos<input name="apellidos" value="${esc(a.apellidos)}"></label><label>Correo<input name="correo" type="email" value="${esc(a.correo)}"></label><label>Programa<select name="programa_id">${L(db.programas,p=>opt(p.id,p.nombre,a.programa_id))}</select></label><label>Estatus<select name="estatus">${opt("ACTIVO","Activo",a.estatus)}${opt("INACTIVO","Inactivo",a.estatus)}</select></label><p class="err" id="fe" role="alert"></p><div class="filtros"><button class="btn">Guardar</button><button type="button" class="btn sec" data-a="cerrar">Cancelar</button></div></form>`)}
+act.nuevoAl=()=>puede("ADMIN")&&formAl();act.editAl=b=>puede("ADMIN")&&formAl(by("alumnos",b.dataset.id));
+act.bajaAl=b=>{if(!puede("ADMIN"))return;run(async()=>{await api("alumnos/"+b.dataset.id,"DELETE");await cargar();pintarAl();aviso("Alumno dado de baja")})};
+sub.al=f=>{if(!puede("ADMIN"))return;const d=Object.fromEntries(new FormData(f)),id=f.dataset.id,e=m=>$("#fe").textContent=m;
+if(!d.matricula.trim()||!d.nombres.trim()||!d.apellidos.trim()||!d.correo.trim())return e("Completa todos los campos.");
+if(!/^\S+@\S+\.\S+$/.test(d.correo))return e("Correo no válido.");
+if(db.alumnos.some(a=>a.id!=id&&a.matricula.toLowerCase()==d.matricula.trim().toLowerCase()))return e("La matrícula ya existe.");
+if(db.alumnos.some(a=>a.id!=id&&a.correo.toLowerCase()==d.correo.trim().toLowerCase()))return e("El correo ya existe.");
+if(!by("programas",d.programa_id))return e("Programa inexistente.");
+const r={matricula:d.matricula.trim(),nombres:d.nombres.trim(),apellidos:d.apellidos.trim(),correo:d.correo.trim(),programa_id:+d.programa_id,estatus:d.estatus};
+run(async()=>{await api("alumnos"+(id?"/"+id:""),id?"PUT":"POST",r);await cargar();$("#dlg").close();pintarAl();aviso("Alumno guardado")},"#fe")};
+/* INSCRIPCIONES */
+const ins={al:null,per:null,sel:new Set()};
+V.inscripciones=()=>{const a=db.alumnos.filter(x=>x.estatus=="ACTIVO");if(!a.some(x=>x.id==ins.al))ins.al=a[0]?.id;ins.per=ins.per||perAct().id;ins.sel.clear();
+return cab("Inscripciones","Elige los grupos del alumno")+`<div class="filtros mt"><label class="grow">Alumno<select data-c="insAl">${L(a,x=>opt(x.id,x.matricula+" · "+nom(x),ins.al))}</select></label><label>Periodo<select data-c="insPer">${L(db.periodos,p=>opt(p.id,p.nombre,ins.per))}</select></label></div><div class="insc">${tabla(["<span class=sr>Elegir</span>","Materia","Grupo","Horario","Docente","Lugares","Créditos"],"<tr></tr>").replace("<tbody><tr></tr></tbody>",'<tbody id="materias"></tbody>')}<div class="tarjeta resumen"><h3 style="margin:0">Resumen</h3><dl><dt>Alumno</dt><dd id="rAl">—</dd><dt>Materias</dt><dd id="rMa">0</dd><dt>Créditos</dt><dd id="rCr">0</dd></dl><p class="err" id="inscError" role="alert"></p><button class="btn" data-a="confirmar">Confirmar inscripción</button></div></div>`};
+const pintarIns=()=>{const gs=db.grupos.filter(g=>g.periodo_id==ins.per),mine=db.inscripciones.filter(i=>i.alumno_id==ins.al&&i.estatus=="INSCRITO"&&gs.some(g=>g.id==i.grupo_id)),mg=mine.map(i=>by("grupos",i.grupo_id));let hay=false;
+$("#materias").innerHTML=L(gs,g=>{const m=by("materias",g.materia_id),d=by("docentes",g.docente_id),yo=mine.find(i=>i.grupo_id==g.id),n=lugares(g),sel=ins.sel.has(g.id),otros=[...[...ins.sel].filter(x=>x!=g.id).map(x=>by("grupos",x)),...mg.filter(x=>x.id!=g.id)],ck=(sel||yo)&&otros.some(o=>choca(hor(g),hor(o)));if(sel&&ck)hay=true;
+return`<tr class="${sel?"sel":""}"><td><input type="checkbox" data-c="selG" data-id="${g.id}" ${sel?"checked":""} ${yo||n<=0?"disabled":""} aria-label="Elegir ${esc(m.nombre)}"></td><td>${esc(m.nombre)} ${yo?`<span class="chip">Inscrito</span> <button class="btn chico sec" data-a="baja" data-id="${yo.id}">Baja</button>`:""}${sel&&ck?' <span class="chip choque">Choque de horario</span>':""}</td><td>${esc(g.clave)}</td><td>${dias(g)} ${hrs(g)}</td><td>${esc(d.nombre)}</td><td>${!yo&&n<=0?'<span class="chip lleno">Sin cupo</span>':n}</td><td>${m.creditos}</td></tr>`});
+const tot=[...mg,...[...ins.sel].map(x=>by("grupos",x))];$("#rAl").textContent=by("alumnos",ins.al)?.matricula||"—";$("#rMa").textContent=tot.length;$("#rCr").textContent=tot.reduce((t,g)=>t+by("materias",g.materia_id).creditos,0);$("#inscError").textContent=hay?"Hay materias con el mismo horario. Quita una para continuar.":""};
+H.inscripciones=pintarIns;
+ch.insAl=e=>{ins.al=+e.value;ins.sel.clear();pintarIns()};ch.insPer=e=>{ins.per=+e.value;ins.sel.clear();pintarIns()};
+ch.selG=e=>{const id=+e.dataset.id;e.checked?ins.sel.add(id):ins.sel.delete(id);pintarIns()};
+act.confirmar=()=>{if(!puede("ADMIN"))return;const er=$("#inscError");if(!ins.sel.size){er.textContent="Elige al menos una materia.";return}if(er.textContent.startsWith("Hay"))return;
+const a=by("alumnos",ins.al);if(!a||a.estatus!="ACTIVO"){er.textContent="El alumno no está activo.";return}
+for(const id of ins.sel){const g=by("grupos",id);if(lugares(g)<=0){er.textContent="El grupo "+g.clave+" ya no tiene cupo.";pintarIns();return}}
+run(async()=>{const n=ins.sel.size;let err;try{await api("inscripciones","POST",{alumno_id:a.id,grupo_ids:[...ins.sel]})}catch(x){err=x}
+await cargar();ins.sel.clear();pintarIns();if(err)throw err;aviso("Inscripción confirmada: "+n+" materias")},"#inscError")};
+act.baja=b=>{if(!puede("ADMIN"))return;run(async()=>{await api("inscripciones/"+b.dataset.id+"/baja","PUT");await cargar();pintarIns()})};
+/* CALIFICACIONES */
+let cg=null;
+V.calificaciones=()=>{if(S.rol=="ALUMNO"){const is=db.inscripciones.filter(i=>i.alumno_id==S.u.alumno_id&&i.estatus=="INSCRITO");return cab("Calificaciones","Consulta de tus calificaciones (escala 0 a 100)")+`<div class="mt"></div>`+tabla(["Materia","Grupo","Parcial 1","Parcial 2","Final"],L(is,i=>{const g=by("grupos",i.grupo_id),c=cal(i)||{};return`<tr><td>${esc(by("materias",g.materia_id).nombre)}</td><td>${esc(g.clave)}</td>${L([c.parcial1,c.parcial2,c.final],v=>`<td>${v??"—"}</td>`)}</tr>`})||`<tr><td colspan="5">Sin inscripciones</td></tr>`)}
+const gs=db.grupos.filter(g=>S.rol=="ADMIN"||g.docente_id==S.u.docente_id);if(!gs.some(g=>g.id==cg))cg=gs[0]?.id;const ed=S.rol=="DOCENTE";
+return cab("Calificaciones",ed?"Captura de tus grupos":"Consulta general (solo lectura)",ed?`<button class="btn" data-a="guardarNotas">Guardar calificaciones</button>`:"")+`<div class="filtros mt"><label class="grow">Grupo<select data-c="cgrupo">${L(gs,g=>opt(g.id,g.clave+" · "+by("materias",g.materia_id).nombre,cg))}</select></label></div><p><span class="aviso">${ed?"Captura abierta":"Solo lectura"}</span> <span class="sub">&nbsp;Escala 0 a 100. La calificación final se calcula sola: promedio de los dos parciales.</span></p><p class="err" id="notaError" role="alert"></p>`+tabla(["Matrícula","Alumno","Parcial 1","Parcial 2","Final"],"<tr></tr>").replace("<tbody><tr></tr></tbody>",'<tbody id="notas"></tbody>')};
+H.calificaciones=()=>{if(S.rol=="ALUMNO")return;const g=by("grupos",cg),ed=S.rol=="DOCENTE";$("#notas").innerHTML=g?L(activas(g),i=>{const a=by("alumnos",i.alumno_id),c=cal(i)||{};return`<tr><td>${esc(a.matricula)}</td><td>${esc(nom(a))}</td>${L(["parcial1","parcial2"],f=>`<td>${ed?`<input class="nota" inputmode="decimal" data-c="calc" data-i="${i.id}" data-f="${f}" value="${c[f]??""}" aria-label="${f}">`:c[f]??"—"}</td>`)}<td class="fin"><b>${c.final??"—"}</b></td>${""}</tr>`})||`<tr><td colspan="5">Sin alumnos inscritos</td></tr>`:""};
+ch.calc=e=>{const tr=e.closest("tr"),v=[...tr.querySelectorAll(".nota")].map(x=>x.value.trim().replace(",",".")),n=v.map(Number);
+tr.querySelector(".fin").innerHTML="<b>"+(v.every((t,k)=>t!==""&&!isNaN(n[k])&&n[k]>=0&&n[k]<=100)?Math.round((n[0]+n[1])/2*100)/100:"—")+"</b>"};
+ch.cgrupo=e=>{cg=+e.value;ir("calificaciones")};
+act.guardarNotas=()=>{if(!puede("DOCENTE"))return;if(by("grupos",cg).docente_id!=S.u.docente_id)return aviso("Acceso denegado: grupo ajeno");let mal=false;const v=[];
+document.querySelectorAll(".nota").forEach(x=>{const t=x.value.trim().replace(",",".");x.classList.remove("mal");if(t===""){v.push([x,null]);return}const n=Number(t);if(isNaN(n)||n<0||n>100){x.classList.add("mal");mal=true}else v.push([x,n])});
+if(mal){$("#notaError").textContent="Hay calificaciones fuera de rango (0 a 100).";return}$("#notaError").textContent="";
+const m={};v.forEach(([x,n])=>{(m[x.dataset.i]??={})[x.dataset.f]=n});
+run(async()=>{await Promise.all(Object.entries(m).map(([i,c])=>api("calificaciones/"+i,"PUT",c)));await cargar();ir("calificaciones");aviso("Calificaciones guardadas")},"#notaError")};
+/* HORARIOS */
+let hsel=null;
+V.horarios=()=>{let o="";if(S.rol=="ALUMNO")hsel="a:"+S.u.alumno_id;else{const gs=db.grupos.filter(g=>S.rol=="ADMIN"||g.docente_id==S.u.docente_id);o=(S.rol=="ADMIN"?`<optgroup label="Por alumno">${L(db.alumnos,a=>opt("a:"+a.id,a.matricula+" · "+nom(a),hsel))}</optgroup>`:"")+`<optgroup label="Por grupo">${L(gs,g=>opt("g:"+g.id,g.clave+" · "+by("materias",g.materia_id).nombre,hsel))}</optgroup>`;if(!hsel||!o.includes(`value="${hsel}"`))hsel=S.rol=="ADMIN"?"a:"+db.alumnos[0].id:"g:"+gs[0]?.id}
+return cab("Horarios","Consulta por alumno y por grupo")+(S.rol=="ALUMNO"?"":`<div class="filtros mt"><label class="grow">Consultar<select data-c="hsel">${o.replace(`value="${hsel}"`,`value="${hsel}" selected`)}</select></label></div>`)+`<div class="mt"></div>`+tabla(["Materia","Docente","Día","Inicio","Fin","Aula"],"<tr></tr>").replace("<tbody><tr></tr></tbody>",'<tbody id="hrs"></tbody>')};
+H.horarios=()=>{const[t,id]=(hsel||"g:0").split(":"),gs=t=="a"?db.inscripciones.filter(i=>i.alumno_id==id&&i.estatus=="INSCRITO").map(i=>by("grupos",i.grupo_id)):[by("grupos",id)].filter(Boolean);
+$("#hrs").innerHTML=L(gs,g=>L(hor(g),h=>`<tr><td>${esc(by("materias",g.materia_id).nombre)}</td><td>${esc(by("docentes",g.docente_id).nombre)}</td><td>${h.dia_semana}</td><td>${h.hora_inicio}</td><td>${h.hora_fin}</td><td>${esc(h.aula)}</td></tr>`))||`<tr><td colspan="6">Sin horarios</td></tr>`};
+ch.hsel=e=>{hsel=e.value;H.horarios()};
+/* CARGAS */
+V.cargas=()=>{const p=perAct(),gs=db.grupos.filter(g=>g.periodo_id==p.id);return cab("Cargas académicas","Grupos y docentes · periodo "+esc(p.nombre),`<button class="btn" data-a="nuevoGr">Nuevo grupo</button>`)+`<div class="mt"></div>`+tabla(["Grupo","Materia","Docente","Horario","Inscritos / cupo"],L(gs,g=>`<tr><td>${esc(g.clave)}</td><td>${esc(by("materias",g.materia_id).nombre)}</td><td><select data-c="cDoc" data-id="${g.id}" aria-label="Docente de ${esc(g.clave)}">${L(db.docentes,d=>opt(d.id,d.nombre,g.docente_id))}</select></td><td>${dias(g)} ${hrs(g)}</td><td>${activas(g).length} / ${g.cupo}</td></tr>`))+`<h3 class="mt">Carga por docente</h3>`+tabla(["Docente","Grupos","Créditos","Alumnos"],L(db.docentes,d=>{const x=gs.filter(g=>g.docente_id==d.id);return`<tr><td>${esc(d.nombre)}</td><td>${x.length}</td><td>${x.reduce((t,g)=>t+by("materias",g.materia_id).creditos,0)}</td><td>${x.reduce((t,g)=>t+activas(g).length,0)}</td></tr>`}))};
+ch.cDoc=e=>{if(!puede("ADMIN"))return;run(async()=>{let err;try{await api("grupos/"+e.dataset.id,"PUT",{docente_id:+e.value})}catch(x){err=x}await cargar();ir("cargas");if(err)throw err;aviso("Docente actualizado")})};
+act.nuevoGr=()=>puede("ADMIN")&&abrir(`<form class="fm" data-f="gr"><h3>Nuevo grupo</h3><label>Clave<input name="clave"></label><label>Materia<select name="materia_id">${L(db.materias,m=>opt(m.id,m.nombre))}</select></label><label>Docente<select name="docente_id">${L(db.docentes,d=>opt(d.id,d.nombre))}</select></label><label>Cupo<input name="cupo" type="number" min="1" value="30"></label><label>Días<select name="dias">${opt("LUN,MIE","Lun y Mié")}${opt("MAR,JUE","Mar y Jue")}${opt("VIE","Vie")}</select></label><label>Inicio<input name="ini" type="time" value="08:00"></label><label>Fin<input name="fin" type="time" value="10:00"></label><label>Aula<input name="aula" value="A-101"></label><p class="err" id="fe" role="alert"></p><div class="filtros"><button class="btn">Guardar</button><button type="button" class="btn sec" data-a="cerrar">Cancelar</button></div></form>`);
+sub.gr=f=>{if(!puede("ADMIN"))return;const d=Object.fromEntries(new FormData(f)),e=m=>$("#fe").textContent=m;
+if(!d.clave.trim())return e("Escribe la clave del grupo.");if(db.grupos.some(g=>g.clave.toLowerCase()==d.clave.trim().toLowerCase()))return e("La clave ya existe.");
+if(!(+d.cupo>0))return e("El cupo debe ser mayor a 0.");if(!d.ini||!d.fin||d.fin<=d.ini)return e("La hora de fin debe ser mayor a la de inicio.");if(!d.aula.trim())return e("Escribe el aula.");
+const nh=d.dias.split(",").map(x=>({dia_semana:x,hora_inicio:d.ini,hora_fin:d.fin}));
+if(db.grupos.some(g=>g.periodo_id==perAct().id&&g.docente_id==d.docente_id&&choca(hor(g),nh)))return e("El docente tiene choque de horario.");
+run(async()=>{await api("grupos","POST",{clave:d.clave.trim(),materia_id:+d.materia_id,docente_id:+d.docente_id,periodo_id:perAct().id,cupo:+d.cupo,dias:d.dias.split(","),hora_inicio:d.ini,hora_fin:d.fin,aula:d.aula.trim()});await cargar();$("#dlg").close();ir("cargas");aviso("Grupo creado")},"#fe")};
+/* REPORTES */
+const rp={per:null,prog:""};
+V.reportes=()=>{rp.per=rp.per||perAct().id;return cab("Reportes","Inscritos y promedio por periodo y programa",`<button class="btn" data-a="csv">Exportar CSV</button>`)+`<div class="filtros mt"><label>Periodo<select data-c="rpPer">${L(db.periodos,p=>opt(p.id,p.nombre,rp.per))}</select></label><label>Programa<select data-c="rpProg"><option value="">Todos</option>${L(db.programas,p=>opt(p.id,p.nombre,rp.prog))}</select></label></div>`+tabla(["Periodo","Programa","Inscritos","Promedio"],L(filasRp(),r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`))};
+const filasRp=()=>{const ip=insPer(rp.per);return db.programas.filter(p=>!rp.prog||p.id==rp.prog).map(p=>{const x=ip.filter(i=>by("alumnos",i.alumno_id).programa_id==p.id);return[by("periodos",rp.per).nombre,p.nombre,x.length,media(x.map(prom))]})};
+ch.rpPer=e=>{rp.per=+e.value;ir("reportes")};ch.rpProg=e=>{rp.prog=e.value;ir("reportes")};
+act.csv=()=>{const t=[["Periodo","Programa","Inscritos","Promedio"],...filasRp()].map(r=>r.map(c=>'"'+c+'"').join(",")).join("\n"),a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+t],{type:"text/csv"}));a.download="reporte_sia.csv";a.click();log("Reporte exportado")};
+/* CATÁLOGOS (RF-09) */
+const CAT={
+programas:{t:"Programas",c:[["clave","Clave"],["nombre","Nombre"]],u:["clave"],r:[["alumnos","programa_id"],["materias","programa_id"]]},
+materias:{t:"Materias",c:[["clave","Clave"],["nombre","Nombre"],["creditos","Créditos","number"],["programa_id","Programa","programas"]],u:["clave"],r:[["grupos","materia_id"]]},
+periodos:{t:"Periodos",c:[["nombre","Nombre"],["fecha_inicio","Inicio","date"],["fecha_fin","Fin","date"]],u:["nombre"],r:[["grupos","periodo_id"]]},
+docentes:{t:"Docentes",c:[["numero_empleado","No. empleado"],["nombre","Nombre"],["correo","Correo","email"]],u:["numero_empleado","correo"],r:[["grupos","docente_id"]]}};
+let ct="programas";
+const esFk=c=>c[2]&&db[c[2]];
+V.catalogos=()=>{const C=CAT[ct];return cab("Catálogos","Programas, materias, periodos y docentes",`<button class="btn" data-a="nuevoCat">Nuevo registro</button>`)+`<div class="filtros mt">${L(Object.keys(CAT),k=>`<button class="btn ${k==ct?"":"sec"}" data-a="tabCat" data-k="${k}" aria-pressed="${k==ct}">${CAT[k].t}</button>`)}</div><div class="mt"></div>`+tabla([...C.c.map(c=>c[1]),""],L(db[ct],r=>`<tr>${L(C.c,c=>`<td>${esFk(c)?esc(by(c[2],r[c[0]])?.nombre||"—"):esc(r[c[0]])}</td>`)}<td><button class="btn chico sec" data-a="editCat" data-id="${r.id}">Editar</button> <button class="btn chico" data-a="delCat" data-id="${r.id}">Eliminar</button></td></tr>`)||`<tr><td colspan="9">Sin registros</td></tr>`)};
+function formCat(r={}){const C=CAT[ct];abrir(`<form class="fm" data-f="cat" data-id="${r.id||""}"><h3>${r.id?"Editar":"Nuevo"} · ${C.t}</h3>${L(C.c,c=>`<label>${c[1]}${esFk(c)?`<select name="${c[0]}">${L(db[c[2]],x=>opt(x.id,x.nombre,r[c[0]]))}</select>`:`<input name="${c[0]}" type="${c[2]||"text"}" value="${esc(r[c[0]])}">`}</label>`)}<p class="err" id="fe" role="alert"></p><div class="filtros"><button class="btn">Guardar</button><button type="button" class="btn sec" data-a="cerrar">Cancelar</button></div></form>`)}
+act.tabCat=b=>{ct=b.dataset.k;ir("catalogos")};
+act.nuevoCat=()=>puede("ADMIN")&&formCat();act.editCat=b=>puede("ADMIN")&&formCat(by(ct,b.dataset.id));
+act.delCat=b=>{if(!puede("ADMIN"))return;const id=+b.dataset.id;if(CAT[ct].r.some(([t,f])=>db[t].some(x=>x[f]==id)))return aviso("No se puede eliminar: tiene registros relacionados");run(async()=>{await api("catalogos/"+ct+"/"+id,"DELETE");await cargar();ir("catalogos");aviso("Registro eliminado")})};
+sub.cat=f=>{if(!puede("ADMIN"))return;const C=CAT[ct],d=Object.fromEntries(new FormData(f)),id=f.dataset.id,e=m=>$("#fe").textContent=m;
+if(C.c.some(c=>!String(d[c[0]]).trim()))return e("Completa todos los campos.");
+for(const k of C.u)if(db[ct].some(x=>x.id!=id&&String(x[k]).toLowerCase()==d[k].trim().toLowerCase()))return e("Ya existe un registro con ese valor en "+k.replace("_"," ")+".");
+if(d.correo&&!/^\S+@\S+\.\S+$/.test(d.correo))return e("Correo no válido.");
+if(ct=="materias"&&!(Number.isInteger(+d.creditos)&&+d.creditos>0))return e("Los créditos deben ser un entero mayor a 0.");
+if(ct=="periodos"&&d.fecha_fin<d.fecha_inicio)return e("La fecha de fin no puede ser anterior a la de inicio.");
+const r={};C.c.forEach(c=>{const v=d[c[0]].trim();r[c[0]]=c[2]=="number"||esFk(c)?+v:v});
+run(async()=>{await api("catalogos/"+ct+(id?"/"+id:""),id?"PUT":"POST",r);await cargar();$("#dlg").close();ir("catalogos");aviso("Registro guardado")},"#fe")};
+/* BITÁCORA (RF-10) */
+V.bitacora=()=>cab("Bitácora","Registro de acciones del sistema",`<button class="btn sec" data-a="csvBit">Exportar CSV</button>`)+`<div class="filtros mt"><label class="grow">Buscar<input id="bq" type="search" data-c="fBit" placeholder="Usuario o acción"></label></div>`+tabla(["Fecha","Usuario","Acción"],"<tr></tr>").replace("<tbody><tr></tr></tbody>",'<tbody id="bit"></tbody>');
+const pintarBit=()=>{const q=$("#bq").value.toLowerCase();$("#bit").innerHTML=L(db.bitacora.filter(b=>(b.u+" "+b.a).toLowerCase().includes(q)),b=>`<tr><td>${esc(b.f)}</td><td>${esc(b.u)}</td><td>${esc(b.a)}</td></tr>`)||`<tr><td colspan="3">Sin movimientos</td></tr>`};
+H.bitacora=pintarBit;ch.fBit=pintarBit;
+act.csvBit=()=>{if(!puede("ADMIN"))return;const t=[["Fecha","Usuario","Acción"],...db.bitacora.map(b=>[b.f,b.u,b.a])].map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(",")).join("\r\n"),a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+t],{type:"text/csv"}));a.download="bitacora_sia.csv";a.click()};
+/* EVALUACIÓN DOCENTE · ALUMNO */
+const EV={p:[],c:null},fch=s=>String(s||"").split("-").reverse().join("/");
+V.evAl=()=>cab("Evaluación docente","Tu opinión es anónima y ayuda a mejorar la docencia")+`<div id="evBox" class="mt"><p class="sub">Cargando tus docentes…</p></div>`;
+H.evAl=()=>run(async()=>{EV.p=await api("evaluaciones/pendientes");pintarEv()});
+function pintarEv(){const n=EV.p.filter(x=>x.puede_evaluar).length;
+$("#evBox").innerHTML=!EV.p.length?`<div class="tarjeta"><p>No tienes grupos inscritos en este periodo, por eso no hay docentes por evaluar.</p></div>`:
+`<p><span class="aviso">${n?`Tienes ${n} evaluación${n>1?"es":""} pendiente${n>1?"s":""}`:"No tienes evaluaciones pendientes"}</span> <span class="sub">&nbsp;Evalúas a cada docente una sola vez, aunque te dé más de una materia. Tus respuestas no se asocian a tu nombre.</span></p>
+<div class="evgrid mt">${L(EV.p,x=>{const v=x.ventana,est=x.evaluada?'<span class="chip">Evaluada</span>':x.puede_evaluar?'<span class="aviso">Pendiente</span>':'<span class="chip baja">'+(v?"Fuera de fecha":"No habilitada")+"</span>";
+return`<div class="tarjeta"><h3>${esc(x.docente)}</h3><p style="margin:0 0 4px">${esc(x.materias)}</p><div class="sub">Grupo${x.grupos.includes(",")?"s":""} ${esc(x.grupos)}${v?` · disponible del ${fch(v.fecha_apertura)} al ${fch(v.fecha_cierre)}`:""}</div><div class="evpie">${est}${x.puede_evaluar?`<button class="btn" data-a="evaluar" data-d="${x.docente_id}" data-p="${x.periodo_id}">Evaluar</button>`:""}</div></div>`})}</div>`}
+act.evaluar=b=>{const g=EV.p.find(x=>x.docente_id==b.dataset.d&&x.periodo_id==b.dataset.p);if(!g||!g.puede_evaluar)return aviso("Esta evaluación no está disponible.");
+run(async()=>{EV.c=EV.c||await api("evaluaciones/criterios");
+abrir(`<form class="fm" data-f="eval" data-d="${g.docente_id}" data-p="${g.periodo_id}" novalidate><h3>Evaluar a ${esc(g.docente)}</h3><p class="sub" style="margin:0">${esc(g.materias)}. Una sola evaluación para todas sus materias. Escala: 1 = muy en desacuerdo, 5 = muy de acuerdo.</p>
+${L(EV.c,(c,i)=>`<fieldset class="preg"><legend>${i+1}. ${esc(c.texto)}</legend><div class="esc">${[1,2,3,4,5].map(k=>`<label class="op"><input type="radio" name="c${c.id}" value="${k}"><span>${k}</span></label>`).join("")}</div></fieldset>`)}
+<label>Comentario (opcional)<textarea name="comentario" maxlength="500" rows="3" placeholder="¿Qué debería conservar o mejorar este docente?"></textarea></label>
+<p class="err" id="evError" role="alert"></p><div class="filtros"><button class="btn">Enviar evaluación</button><button type="button" class="btn sec" data-a="cerrar">Cancelar</button></div></form>`,1)})};
+sub.eval=f=>run(async()=>{const resp=EV.c.map(c=>{const r=f.querySelector(`input[name=c${c.id}]:checked`);return r?{criterio_id:c.id,puntaje:+r.value}:null});
+if(resp.some(x=>!x))throw new Error("Contesta las "+EV.c.length+" preguntas para enviar tu evaluación.");
+const r=await api("evaluaciones","POST",{docente_id:+f.dataset.d,periodo_id:+f.dataset.p,respuestas:resp,comentario:f.comentario.value});
+act.cerrar();aviso(r.mensaje);H.evAl()},"#evError");
+/* EVALUACIÓN DOCENTE · ADMINISTRADOR Y DOCENTE */
+let EVA={r:[],v:[],m:[]};
+const f2=v=>v==null?"—":Number(v).toFixed(2);
+const nivChip=n=>`<span class="${n=="Excelente"||n=="Bueno"?"chip":n=="Regular"?"aviso":n=="Requiere atención"?"chip baja":"chip lleno"}">${esc(n)}</span>`;
+V.evaluacion=()=>S.rol=="ALUMNO"?V.evAl():S.rol=="ADMIN"?V.evAd():V.evDo();
+H.evaluacion=()=>S.rol=="ALUMNO"?H.evAl():S.rol=="ADMIN"?H.evAd():H.evDo();
+/* Administrador */
+V.evAd=()=>cab("Evaluación docente","Resultados automáticos por docente y grupo · las respuestas son anónimas",`<button class="btn sec" data-a="csvEv">Exportar CSV</button>`)+`<div id="evAd" class="mt"><p class="sub">Cargando resultados…</p></div>`;
+H.evAd=()=>run(async()=>{const[r,v,m]=await Promise.all([api("evaluaciones/resultados"),api("evaluaciones/ventanas"),api("evaluaciones/comentarios")]);EVA={r,v,m};pintarEvAd()});
+function pintarEvAd(){const r=EVA.r,tot=r.reduce((t,x)=>t+x.evaluaciones,0),ins=r.reduce((t,x)=>t+x.inscritos,0),pg=tot?r.filter(x=>x.promedio!=null).reduce((t,x)=>t+x.promedio*x.evaluaciones,0)/tot:null,aten=r.filter(x=>x.nivel=="Requiere atención").length;
+const k=[["Promedio general",f2(pg)+(pg==null?"":" / 5")],["Evaluaciones recibidas",tot+" de "+ins],["Participación",(ins?Math.round(tot*100/ins):0)+"%"],["Requieren atención",aten]];
+$("#evAd").innerHTML=`<div class="kpis" style="margin-top:0">${L(k,x=>`<div class="kpi"><span>${x[0]}</span><b>${x[1]}</b></div>`)}</div>
+<h3 class="mt">Ventana de evaluación</h3><p class="sub">La evaluación se abre y se cierra sola según estas fechas.</p>`+
+tabla(["Periodo","Apertura","Cierre","Estado",""],L(EVA.v,v=>`<tr><td>${esc(v.nombre)}</td><td><input type="date" id="vA${v.periodo_id}" value="${esc(v.fecha_apertura||"")}" aria-label="Apertura ${esc(v.nombre)}"></td><td><input type="date" id="vC${v.periodo_id}" value="${esc(v.fecha_cierre||"")}" aria-label="Cierre ${esc(v.nombre)}"></td><td>${!v.fecha_apertura?'<span class="chip lleno">Sin configurar</span>':v.abierta?'<span class="chip">Abierta</span>':'<span class="chip baja">Cerrada</span>'}</td><td><button class="btn chico" data-a="evVentana" data-id="${v.periodo_id}">Guardar</button></td></tr>`))+
+`<p class="err" id="evVError" role="alert"></p><h3 class="mt">Resultados por docente</h3>`+
+tabla(["Docente","Materias","Periodo","Evaluaciones","Participación","Promedio","Nivel",""],L(r,x=>`<tr><td>${esc(x.docente)}</td><td>${esc(x.materias)}</td><td>${esc(x.periodo)}</td><td>${x.evaluaciones} / ${x.inscritos}</td><td>${x.participacion_pct==null?"—":x.participacion_pct+"%"}</td><td><b>${f2(x.promedio)}</b></td><td>${nivChip(x.nivel)}</td><td><button class="btn chico sec" data-a="evDetalle" data-id="${x.docente_id}" data-n="${esc(x.docente)}">Detalle</button></td></tr>`)||`<tr><td colspan="8">Sin grupos</td></tr>`)+
+`<h3 class="mt">Comentarios anónimos</h3><div class="tarjeta"><ul class="lista">${L(EVA.m,c=>`<li>${esc(c.comentario)}<div class="sub">${esc(c.docente)} · ${esc(c.periodo)} · ${esc(c.fecha)}</div></li>`)||"<li>Aún no hay comentarios.</li>"}</ul></div>`}
+act.evDetalle=b=>run(async()=>{const d=await api("evaluaciones/criterios-docente/"+b.dataset.id);
+abrir(`<div class="fm"><h3>Detalle · ${esc(b.dataset.n)}</h3><p class="sub" style="margin:0">Promedio por pregunta (escala de 1 a 5).</p>${L(d,c=>`<div class="barra"><div><span>${esc(c.texto)}</span><b>${f2(c.promedio)}</b></div><div class="pista"><i style="width:${Math.round(c.promedio*20)}%"></i></div></div>`)||"<p>Este docente aún no tiene evaluaciones.</p>"}<div class="filtros"><button class="btn sec" data-a="cerrar">Cerrar</button></div></div>`,1)});
+act.evVentana=b=>run(async()=>{const id=b.dataset.id;await api("evaluaciones/ventanas/"+id,"PUT",{fecha_apertura:$("#vA"+id).value,fecha_cierre:$("#vC"+id).value});aviso("Ventana actualizada");H.evAd()},"#evVError");
+act.csvEv=()=>{if(!puede("ADMIN"))return;const t=[["Periodo","Docente","Materias","Evaluaciones","Inscritos","Participación %","Promedio","Nivel"],...EVA.r.map(x=>[x.periodo,x.docente,x.materias,x.evaluaciones,x.inscritos,x.participacion_pct??"",x.promedio??"",x.nivel])].map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(",")).join("\r\n"),a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["﻿"+t],{type:"text/csv"}));a.download="evaluacion_docente_sia.csv";a.click()};
+/* Docente: solo su propio promedio */
+V.evDo=()=>cab("Mi evaluación docente","Resultado de tus grupos · anónimo")+`<div id="evDo" class="mt"><p class="sub">Cargando tu resultado…</p></div>`;
+H.evDo=()=>run(async()=>{const d=await api("evaluaciones/mi-resultado");
+$("#evDo").innerHTML=`<div class="kpis" style="margin-top:0"><div class="kpi"><span>Mi promedio</span><b>${f2(d.promedio)}${d.promedio==null?"":" / 5"}</b></div><div class="kpi"><span>Evaluaciones recibidas</span><b>${d.evaluaciones}</b></div><div class="kpi"><span>Nivel</span><b style="font-size:24px">${esc(d.nivel)}</b></div></div>
+<p class="sub">Solo se muestra tu promedio. Los comentarios y la identidad de los alumnos no son visibles para nadie.</p>`+
+tabla(["Periodo","Materias","Evaluaciones","Participación","Promedio","Nivel"],L(d.grupos,x=>`<tr><td>${esc(x.periodo)}</td><td>${esc(x.materias)}</td><td>${x.evaluaciones} / ${x.inscritos}</td><td>${x.participacion_pct==null?"—":x.participacion_pct+"%"}</td><td><b>${f2(x.promedio)}</b></td><td>${nivChip(x.nivel)}</td></tr>`)||`<tr><td colspan="6">Sin grupos</td></tr>`)});
+/* PANEL: resumen de evaluación docente */
+const vPanel=V.panel;V.panel=()=>vPanel()+`<div id="evPanel" class="mt"></div>`;
+act.irEv=()=>ir("evaluacion");
+H.panel=()=>run(async()=>{const box=$("#evPanel");if(!box)return;let t,c,b;
+if(S.rol=="ALUMNO"){const p=await api("evaluaciones/pendientes"),n=p.filter(x=>x.puede_evaluar).length;
+t="Evaluación docente";c=n?`Tienes <b>${n}</b> docente${n>1?"s":""} por evaluar. Es anónimo y toma menos de dos minutos.`:"No tienes evaluaciones pendientes. ¡Gracias por participar!";b=n?"Evaluar ahora":""}
+else if(S.rol=="ADMIN"){const r=await api("evaluaciones/resultados"),tot=r.reduce((a,x)=>a+x.evaluaciones,0),ins=r.reduce((a,x)=>a+x.inscritos,0),pg=tot?r.filter(x=>x.promedio!=null).reduce((a,x)=>a+x.promedio*x.evaluaciones,0)/tot:null,at=r.filter(x=>x.nivel=="Requiere atención").length;
+t="Evaluación docente";c=`Participación <b>${ins?Math.round(tot*100/ins):0}%</b> (${tot} de ${ins}) · promedio general <b>${f2(pg)}</b> · docentes que requieren atención: <b>${at}</b>`;b="Ver resultados"}
+else{const d=await api("evaluaciones/mi-resultado");t="Mi evaluación docente";c=`Mi promedio: <b>${f2(d.promedio)}</b> · ${d.evaluaciones} evaluación${d.evaluaciones==1?"":"es"} · nivel <b>${esc(d.nivel)}</b>`;b="Ver detalle"}
+box.innerHTML=`<div class="tarjeta"><div class="cabecera" style="border:0;padding:0"><div><h3 style="margin:0 0 6px">${t}</h3><div>${c}</div></div>${b?`<button class="btn" data-a="irEv">${b}</button>`:""}</div></div>`});
+/* SESIÓN, TEMA Y EVENTOS */
+sub.login=async()=>{const v=$("#usuario").value.trim(),p=$("#clave").value,e=$("#loginError");e.style.color="";
+if(!v||!p){e.textContent="Escribe tu usuario y tu contraseña para continuar.";return}
+try{const r=await api("login","POST",{usuario:v,password:p});TOKEN=r.token;try{sessionStorage.setItem("sia_token",TOKEN)}catch(x){}await entrar(r.usuario)}catch(x){TOKEN=null;e.textContent=x.message}};
+/* REGISTRO: activa la cuenta de un alumno o docente que ya existe en control escolar */
+const verForm=reg=>{$("form[data-f=login]").hidden=reg;$("#formRegistro").hidden=!reg;$("#regListo").hidden=true;$("#loginError").textContent="";$("#regError").textContent="";(reg?$("#regTipo"):$("#usuario")).focus()};
+let regCorreo="";
+act.reenviar=b=>{b.disabled=true;api("registro/reenviar","POST",{correo:regCorreo}).then(r=>$("#reenvioMsg").textContent=r.mensaje).catch(x=>$("#reenvioMsg").textContent=x.message).finally(()=>setTimeout(()=>b.disabled=false,30000))};
+act.verRegistro=()=>verForm(true);act.verLogin=()=>verForm(false);
+ch.regTipo=e=>{const d=e.value=="DOCENTE";$("#regIdTx").textContent=d?"Número de empleado":"Matrícula";$("#regId").placeholder=d?"Ej. DOC-102":"Ej. UTC2026002"};
+sub.registro=async f=>{const d=Object.fromEntries(new FormData(f)),e=$("#regError"),b=f.querySelector("button.btn");
+d.identificador=d.identificador.trim();d.correo=d.correo.trim().toLowerCase();
+if(!d.identificador||!d.correo||!d.password||!d.password2){e.textContent="Completa todos los campos.";return}
+if(!/^\S+@\S+\.\S+$/.test(d.correo)){e.textContent="Escribe un correo válido.";return}
+if(d.password.length<8||!/[A-Za-z]/.test(d.password)||!/\d/.test(d.password)){e.textContent="La contraseña debe tener mínimo 8 caracteres, con letras y números.";return}
+if(d.password!==d.password2){e.textContent="Las contraseñas no coinciden.";return}
+e.textContent="";b.disabled=true;
+try{await api("registro","POST",{tipo:d.tipo,identificador:d.identificador,correo:d.correo,password:d.password});
+regCorreo=d.correo;f.reset();ch.regTipo($("#regTipo"));f.hidden=true;$("#regCorreo").textContent=d.correo;$("#reenvioMsg").textContent="";$("#regListo").hidden=false}
+catch(x){e.textContent=x.message}finally{b.disabled=false}};
+/* Al volver del enlace del correo: /?activada=1 o /?activada=0 */
+(()=>{const q=new URLSearchParams(location.search),a=q.get("activada");if(a==null)return;history.replaceState(null,"",location.pathname);
+setTimeout(()=>{if(a=="1"){$("#loginError").style.color="var(--k2)";$("#loginError").textContent="¡Tu cuenta quedó activada! Ya puedes iniciar sesión."}else $("#loginError").textContent="El enlace de activación no es válido o ya venció. Regístrate de nuevo o pide que te reenvíen el correo."},0)})();
+async function entrar(u){await cargar();S={u,rol:u.rol};$("#loginError").textContent="";$("#sesion").textContent="Sesión: "+({ADMIN:"Administrador",DOCENTE:"Docente",ALUMNO:"Alumno"})[u.rol];
+$("#nav").innerHTML=L(NAV[u.rol],n=>`<button data-ir="${n[0]}">${n[1]}</button>`);$("#login").hidden=true;$("#app").hidden=false;ir("evaluacion")};
+act.salir=()=>{S=null;TOKEN=null;db=null;try{sessionStorage.removeItem("sia_token")}catch(e){}$("#clave").value="";$("#app").hidden=true;$("#login").hidden=false};
+act.cerrar=()=>$("#dlg").close();act.aviso=b=>aviso(b.dataset.t);
+act.tema=()=>aplicarTema(document.documentElement.dataset.tema=="dark"?"light":"dark");
+function aplicarTema(t){document.documentElement.dataset.tema=t;const b=$("#tema");b.textContent=t=="dark"?"Modo claro":"Modo oscuro";b.setAttribute("aria-pressed",t=="dark");try{localStorage.setItem("tema",t)}catch(e){}}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(b&&act[b.dataset.a])return act[b.dataset.a](b);const n=e.target.closest("nav button");if(n)ir(n.dataset.ir)});
+document.addEventListener("input",e=>{const f=e.target.dataset.c;f&&ch[f]&&ch[f](e.target)});
+document.addEventListener("submit",e=>{e.preventDefault();const f=e.target.dataset.f;f&&sub[f](e.target)});
+aplicarTema(document.documentElement.dataset.tema);
+try{const t=sessionStorage.getItem("sia_token");if(t){TOKEN=t;entrar(JSON.parse(atob(t.split(".")[1].replace(/-/g,"+").replace(/_/g,"/")))).catch(()=>act.salir())}}catch(e){}
+</script></body></html>
