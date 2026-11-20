@@ -82,9 +82,11 @@ textarea{border:1px solid var(--bi);border-radius:3px;padding:10px 14px;font:16p
 <button type="button" class="enlace" data-a="aviso" data-t="Se enviará un enlace de recuperación a tu correo institucional">¿Olvidaste tu contraseña?</button>
 <p class="sub" style="margin:0">¿Primera vez en el SIA? <button type="button" class="enlace" data-a="verRegistro">Crea tu cuenta</button></p></form>
 <form data-f="registro" id="formRegistro" novalidate hidden><h2>Crear cuenta</h2>
-<p class="sub" style="margin:0">Puedes usar tu Gmail, Outlook o cualquier correo. Te enviaremos un enlace para activar tu cuenta.</p>
+<p class="sub" style="margin:0">Regístrate con tu matrícula y cualquier correo (Gmail, Outlook…). Te enviaremos un enlace para activar tu cuenta.</p>
 <label>Soy<select name="tipo" id="regTipo" data-c="regTipo"><option value="ALUMNO">Alumno</option><option value="DOCENTE">Docente</option></select></label>
-<label><span id="regIdTx">Matrícula</span><input name="identificador" id="regId" autocomplete="off" placeholder="Ej. UTC2026002"></label>
+<label><span id="regIdTx">Matrícula</span><input name="identificador" id="regId" autocomplete="off" placeholder="Ej. 010186531"></label>
+<div class="filtros"><label class="grow" style="min-width:150px">Nombre(s)<input name="nombres" autocomplete="given-name"></label><label class="grow" style="min-width:150px">Apellidos<input name="apellidos" autocomplete="family-name"></label></div>
+<label id="regProgLbl">Carrera<select name="programa_id" id="regProg"><option value="">Elige tu carrera</option></select></label>
 <label>Correo electrónico<input name="correo" type="email" autocomplete="email" placeholder="Ej. tunombre@gmail.com"></label>
 <label>Contraseña<input name="password" type="password" autocomplete="new-password" aria-describedby="regReglas"></label>
 <label>Confirmar contraseña<input name="password2" type="password" autocomplete="new-password"></label>
@@ -301,16 +303,18 @@ try{const r=await api("login","POST",{usuario:v,password:p});TOKEN=r.token;try{s
 const verForm=reg=>{$("form[data-f=login]").hidden=reg;$("#formRegistro").hidden=!reg;$("#regListo").hidden=true;$("#loginError").textContent="";$("#regError").textContent="";(reg?$("#regTipo"):$("#usuario")).focus()};
 let regCorreo="";
 act.reenviar=b=>{b.disabled=true;api("registro/reenviar","POST",{correo:regCorreo}).then(r=>$("#reenvioMsg").textContent=r.mensaje).catch(x=>$("#reenvioMsg").textContent=x.message).finally(()=>setTimeout(()=>b.disabled=false,30000))};
-act.verRegistro=()=>verForm(true);act.verLogin=()=>verForm(false);
-ch.regTipo=e=>{const d=e.value=="DOCENTE";$("#regIdTx").textContent=d?"Número de empleado":"Matrícula";$("#regId").placeholder=d?"Ej. DOC-102":"Ej. UTC2026002"};
+act.verRegistro=()=>{verForm(true);if($("#regProg").options.length<2)api("programas").then(p=>$("#regProg").insertAdjacentHTML("beforeend",L(p,x=>opt(x.id,x.nombre)))).catch(()=>{})};act.verLogin=()=>verForm(false);
+ch.regTipo=e=>{const d=e.value=="DOCENTE";$("#regIdTx").textContent=d?"Número de empleado":"Matrícula";$("#regId").placeholder=d?"Ej. DOC-120":"Ej. 010186531";$("#regProgLbl").hidden=d};
 sub.registro=async f=>{const d=Object.fromEntries(new FormData(f)),e=$("#regError"),b=f.querySelector("button.btn");
 d.identificador=d.identificador.trim();d.correo=d.correo.trim().toLowerCase();
-if(!d.identificador||!d.correo||!d.password||!d.password2){e.textContent="Completa todos los campos.";return}
+d.nombres=d.nombres.trim();d.apellidos=d.apellidos.trim();
+if(!d.identificador||!d.nombres||!d.apellidos||!d.correo||!d.password||!d.password2){e.textContent="Completa todos los campos.";return}
+if(d.tipo=="ALUMNO"&&!d.programa_id){e.textContent="Elige tu carrera.";return}
 if(!/^\S+@\S+\.\S+$/.test(d.correo)){e.textContent="Escribe un correo válido.";return}
 if(d.password.length<8||!/[A-Za-z]/.test(d.password)||!/\d/.test(d.password)){e.textContent="La contraseña debe tener mínimo 8 caracteres, con letras y números.";return}
 if(d.password!==d.password2){e.textContent="Las contraseñas no coinciden.";return}
 e.textContent="";b.disabled=true;
-try{await api("registro","POST",{tipo:d.tipo,identificador:d.identificador,correo:d.correo,password:d.password});
+try{await api("registro","POST",{tipo:d.tipo,identificador:d.identificador,nombres:d.nombres,apellidos:d.apellidos,programa_id:+d.programa_id||null,correo:d.correo,password:d.password});
 regCorreo=d.correo;f.reset();ch.regTipo($("#regTipo"));f.hidden=true;$("#regCorreo").textContent=d.correo;$("#reenvioMsg").textContent="";$("#regListo").hidden=false}
 catch(x){e.textContent=x.message}finally{b.disabled=false}};
 /* Al volver del enlace del correo: /?activada=1 o /?activada=0 */

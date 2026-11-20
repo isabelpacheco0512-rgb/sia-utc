@@ -110,28 +110,54 @@ async function mandarActivacion(usuarioId, correo, nombre) {
     </div>`);
 }
 
+// Programas para el formulario de registro (público, sin sesión)
+app.get("/api/programas", ah(async (req, res) => res.json(await q("SELECT id, nombre FROM programas ORDER BY nombre"))));
+
 app.post("/api/registro", ah(async (req, res) => {
-  const { tipo, identificador, password } = req.body, correo = String(req.body.correo || "").trim().toLowerCase();
-  if (!["ALUMNO", "DOCENTE"].includes(tipo) || !txt(identificador)) throw fail(400, "Completa todos los campos.");
+  const { tipo, password } = req.body, correo = String(req.body.correo || "").trim().toLowerCase();
+  const identificador = String(req.body.identificador || "").trim(), nombres = String(req.body.nombres || "").trim(), apellidos = String(req.body.apellidos || "").trim();
+  if (!["ALUMNO", "DOCENTE"].includes(tipo) || !identificador || !nombres || !apellidos) throw fail(400, "Completa todos los campos.");
+  if (!/^[A-Za-z0-9-]{3,20}$/.test(identificador)) throw fail(400, "La matrícula o número de empleado solo lleva letras, números o guiones (3 a 20).");
   if (!correoOk(correo)) throw fail(400, "Escribe un correo válido.");
   if (!passOk(password)) throw fail(400, "La contraseña debe tener mínimo 8 caracteres, con letras y números.");
-  const alumno = tipo === "ALUMNO";
-  const [p] = alumno
-    ? await q("SELECT id, nombres AS nombre FROM alumnos WHERE matricula = ? AND estatus = 'ACTIVO'", [identificador.trim()])
-    : await q("SELECT id, nombre FROM docentes WHERE numero_empleado = ?", [identificador.trim()]);
-  if (!p) throw fail(404, alumno ? "No encontramos esa matrícula entre los alumnos activos. Revísala o acude a control escolar."
-                                 : "No encontramos ese número de empleado. Revísalo o acude a control escolar.");
-  const col = alumno ? "alumno_id" : "docente_id";
-  const [ya] = await q(`SELECT id, activo FROM usuarios WHERE ${col} = ?`, [p.id]);
-  if (ya?.activo) throw fail(409, `Ya existe una cuenta para ${alumno ? "esa matrícula" : "ese número de empleado"}. Inicia sesión.`);
-  const [otro] = await q("SELECT id FROM usuarios WHERE email = ? AND id <> ?", [correo, ya?.id || 0]);
-  if (otro) throw fail(409, "Ese correo ya está registrado. Usa otro o inicia sesión.");
-  const hash = await bcrypt.hash(password, 10);
-  let id = ya?.id;
-  if (id) await q("UPDATE usuarios SET email = ?, password_hash = ? WHERE id = ?", [correo, hash, id]);   // se registró antes y no activó
-  else id = (await q(`INSERT INTO usuarios (email, password_hash, rol, ${col}, activo) VALUES (?, ?, ?, ?, 0)`, [correo, hash, tipo, p.id])).insertId;
-  await mandarActivacion(id, correo, p.nombre);
-  await log(id, "Registro de cuenta (pendiente de activar)");
+  const alumno = tipo === "ALUMNO", col = alumno ? "alumno_id" : "docente_id";
+  const [otro] = await q("SELECT id, alumno_id, docente_id FROM usuarios WHERE email = ?", [correo]);
+
+  const r = await tx(async c => {
+    // 1. Busca la matrícula / número de empleado; si no existe, lo da de alta
+    let [[p]] = alumno
+      ? await c.query("SELECT id, nombres AS nombre, estatus FROM alumnos WHERE matricula = ? FOR UPDATE", [identificador])
+      : await c.query("SELECT id, nombre FROM docentes WHERE numero_empleado = ? FOR UPDATE", [identificador]);
+    if (p?.estatus === "INACTIVO") throw fail(403, "Esa matrícula está dada de baja. Acude a control escolar.");
+    if (!p) {
+      if (alumno) {
+        const [[prog]] = await c.query("SELECT id FROM programas WHERE id = ?", [+req.body.programa_id || 0]);
+        if (!prog) throw fail(400, "Elige tu carrera.");
+        const [[dup]] = await c.query("SELECT 1 AS x FROM alumnos WHERE correo = ?", [correo]);
+        if (dup) throw fail(409, "Ese correo ya pertenece a otro alumno. Usa otro.");
+        const [ins] = await c.query("INSERT INTO alumnos (matricula, nombres, apellidos, correo, programa_id, estatus) VALUES (?,?,?,?,?, 'ACTIVO')",
+          [identificador, nombres, apellidos, correo, prog.id]);
+        p = { id: ins.insertId, nombre: nombres };
+      } else {
+        const [[dup]] = await c.query("SELECT 1 AS x FROM docentes WHERE correo = ?", [correo]);
+        if (dup) throw fail(409, "Ese correo ya pertenece a otro docente. Usa otro.");
+        const [ins] = await c.query("INSERT INTO docentes (numero_empleado, nombre, correo) VALUES (?,?,?)", [identificador, `${nombres} ${apellidos}`, correo]);
+        p = { id: ins.insertId, nombre: nombres };
+      }
+    }
+    // 2. Crea (o actualiza, si nunca activó) la cuenta de acceso
+    const [[ya]] = await c.query(`SELECT id, activo FROM usuarios WHERE ${col} = ?`, [p.id]);
+    if (ya?.activo) throw fail(409, `Ya existe una cuenta para ${alumno ? "esa matrícula" : "ese número de empleado"}. Inicia sesión.`);
+    if (otro && otro.id !== ya?.id) throw fail(409, "Ese correo ya está registrado. Usa otro o inicia sesión.");
+    const hash = await bcrypt.hash(password, 10);
+    let id = ya?.id;
+    if (id) await c.query("UPDATE usuarios SET email = ?, password_hash = ? WHERE id = ?", [correo, hash, id]);
+    else id = (await c.query(`INSERT INTO usuarios (email, password_hash, rol, ${col}, activo) VALUES (?, ?, ?, ?, 0)`, [correo, hash, tipo, p.id]))[0].insertId;
+    return { id, nombre: p.nombre };
+  });
+
+  await mandarActivacion(r.id, correo, r.nombre);
+  await log(r.id, `Registro de cuenta ${tipo.toLowerCase()} ${identificador} (pendiente de activar)`);
   res.status(201).json({ ok: true, mensaje: "Te enviamos un correo para activar tu cuenta." });
 }));
 
