@@ -4,6 +4,7 @@ import mysql from "mysql2/promise";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "node:crypto";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -64,11 +65,26 @@ app.post("/api/login", ah(async (req, res) => {
 /* ---------- Registro con correo de activación ----------
    Se registran alumnos y docentes que ya dio de alta control escolar (matrícula o número de empleado),
    con el correo que quieran (Gmail, Outlook…). La cuenta nace inactiva hasta que abren el enlace. */
-const APP_URL = (process.env.APP_URL || `http://localhost:${process.env.PORT || 3000}`).replace(/\/$/, "");
+// IP de la compu en la red Wi-Fi (ej. 192.168.1.50) para que el enlace del correo abra desde el celular
+const ipLocal = () => Object.values(os.networkInterfaces()).flat()
+  .find(n => n && n.family === "IPv4" && !n.internal && /^(192\.168|10\.|172\.(1[6-9]|2\d|3[01]))/.test(n.address))?.address || "localhost";
+// En Railway usa su dominio público; en tu compu, la IP del Wi-Fi
+const APP_URL = (process.env.APP_URL
+  || (process.env.RAILWAY_PUBLIC_DOMAIN ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` : `http://${ipLocal()}:${process.env.PORT || 3000}`)).replace(/\/$/, "");
 const sha = t => crypto.createHash("sha256").update(t).digest("hex");
 const passOk = p => typeof p === "string" && p.length >= 8 && /[A-Za-z]/.test(p) && /\d/.test(p);
 let transporte = null;
 async function enviarCorreo(para, asunto, html) {
+  if (process.env.BREVO_API_KEY) {                                 // en Railway: API de Brevo por HTTPS (SMTP está bloqueado)
+    const r = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: { "api-key": process.env.BREVO_API_KEY, "Content-Type": "application/json", accept: "application/json" },
+      body: JSON.stringify({ sender: { name: "SIA · Universidad Tecnológica del Centro", email: process.env.MAIL_FROM },
+                             to: [{ email: para }], subject: asunto, htmlContent: html })
+    });
+    if (!r.ok) { console.error("Brevo:", r.status, await r.text()); throw fail(502, "No se pudo enviar el correo. Intenta más tarde."); }
+    return;
+  }
   if (!process.env.MAIL_USER || !process.env.MAIL_PASS) {          // sin Gmail configurado: el enlace sale en la terminal
     console.log(`\n[CORREO DE PRUEBA] Para: ${para}\nAsunto: ${asunto}\n${html.match(/href="([^"]+)"/)?.[1] || ""}\n`);
     return;
@@ -445,4 +461,7 @@ app.use((err, req, res, next) => {
 
 pool.query("SELECT 1").then(() => console.log("MySQL conectado: " + (process.env.DB_NAME || "sia_demo")))
   .catch(e => console.error("NO se pudo conectar a MySQL:", e.message));
-app.listen(process.env.PORT || 3000, () => console.log(`SIA en http://localhost:${process.env.PORT || 3000}`));
+app.listen(process.env.PORT || 3000, "0.0.0.0", () => {
+  console.log(`SIA en http://localhost:${process.env.PORT || 3000}`);
+  console.log(`Desde tu celular (misma red Wi-Fi): ${APP_URL}`);
+});
