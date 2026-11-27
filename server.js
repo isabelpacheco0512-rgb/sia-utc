@@ -474,6 +474,74 @@ app.get("/api/evaluaciones/mi-resultado", auth, solo("DOCENTE"), ah(async (req, 
   res.json({ promedio: t.promedio, evaluaciones: t.evaluaciones, nivel, grupos });
 }));
 
+/* ---------- EVALUACIÓN DE INSTALACIONES Y SERVICIOS (solo alumnos) ----------
+   ALUMNO -> contesta una vez por periodo (4 áreas, 12 preguntas, escala 1 a 5).
+   ADMIN  -> ve promedio y nivel por área, detalle por pregunta, participación y comentarios.
+   Usa la misma ventana de fechas que la evaluación docente. */
+const periodoActual = async () => (await q(`SELECT id, nombre FROM periodos
+  ORDER BY (CURDATE() BETWEEN fecha_inicio AND fecha_fin) DESC, fecha_inicio DESC LIMIT 1`))[0];
+const nivelDe = p => p == null ? "Sin evaluaciones" : p >= 4.5 ? "Excelente" : p >= 4 ? "Bueno" : p >= 3 ? "Regular" : "Requiere atención";
+
+app.get("/api/instalaciones/criterios", auth, solo("ALUMNO", "ADMIN"), ah(async (req, res) => {
+  const filas = await q(`SELECT a.id AS area_id, a.nombre AS area, c.id, c.texto FROM inst_criterios c
+      JOIN inst_areas a ON a.id = c.area_id WHERE c.activo = 1 ORDER BY a.orden, c.orden`);
+  const areas = [];
+  for (const f of filas) {
+    let a = areas.find(x => x.id === f.area_id);
+    if (!a) areas.push(a = { id: f.area_id, nombre: f.area, criterios: [] });
+    a.criterios.push({ id: f.id, texto: f.texto });
+  }
+  res.json(areas);
+}));
+
+app.get("/api/instalaciones/estado", auth, solo("ALUMNO"), ah(async (req, res) => {
+  const p = await periodoActual();
+  if (!p) return res.json({ periodo: null });
+  const [ya] = await q("SELECT 1 AS x FROM inst_evaluaciones WHERE alumno_id = ? AND periodo_id = ?", [req.u.alumno_id, p.id]);
+  const v = await ventanaDe(p.id);
+  res.json({ periodo_id: p.id, periodo: p.nombre, ventana: v, evaluada: !!ya, puede_evaluar: !ya && !!v?.abierta });
+}));
+
+app.post("/api/instalaciones", auth, solo("ALUMNO"), ah(async (req, res) => {
+  const p = await periodoActual();
+  if (!p || +req.body.periodo_id !== p.id) throw fail(400, "Periodo no válido.");
+  const [al] = await q("SELECT 1 AS x FROM alumnos WHERE id = ? AND estatus = 'ACTIVO'", [req.u.alumno_id]);
+  if (!al) throw fail(403, "Solo los alumnos activos pueden evaluar las instalaciones.");
+  const [ya] = await q("SELECT 1 AS x FROM inst_evaluaciones WHERE alumno_id = ? AND periodo_id = ?", [req.u.alumno_id, p.id]);
+  if (ya) throw fail(409, "Ya evaluaste las instalaciones en este periodo.");
+  const v = await ventanaDe(p.id);
+  if (!v?.abierta) throw fail(409, v ? `La evaluación estuvo disponible del ${v.fecha_apertura} al ${v.fecha_cierre}.` : "La evaluación aún no está habilitada para este periodo.");
+  const crit = await q("SELECT id FROM inst_criterios WHERE activo = 1");
+  const mapa = new Map((Array.isArray(req.body.respuestas) ? req.body.respuestas : []).map(r => [+r.criterio_id, +r.puntaje]));
+  for (const c of crit) { const x = mapa.get(c.id); if (!Number.isInteger(x) || x < 1 || x > 5) throw fail(400, "Contesta todas las preguntas con un valor de 1 a 5."); }
+  const com = txt(req.body.comentario) ? req.body.comentario.trim().slice(0, 500) : null;
+  const promedio = Math.round((crit.reduce((t, c) => t + mapa.get(c.id), 0) / crit.length) * 100) / 100;
+  await tx(async c => {
+    const [r] = await c.query("INSERT INTO inst_evaluaciones (alumno_id, periodo_id, comentario, promedio) VALUES (?,?,?,?)", [req.u.alumno_id, p.id, com, promedio]);
+    await c.query("INSERT INTO inst_respuestas (evaluacion_id, criterio_id, puntaje) VALUES ?", [crit.map(k => [r.insertId, k.id, mapa.get(k.id)])]);
+  });
+  await log(req.u.id, "Evaluación de instalaciones enviada");
+  res.status(201).json({ ok: true, mensaje: "¡Gracias! Tu opinión sobre las instalaciones se registró de forma anónima." });
+}));
+
+app.get("/api/instalaciones/resultados", auth, solo("ADMIN"), ah(async (req, res) => {
+  const p = req.query.periodoId ? (await q("SELECT id, nombre FROM periodos WHERE id = ?", [req.query.periodoId]))[0] : await periodoActual();
+  if (!p) return res.json({ periodo: null, areas: [], criterios: [], comentarios: [] });
+  const [t] = await q("SELECT COUNT(*) AS evaluaciones, ROUND(AVG(promedio),2) AS promedio FROM inst_evaluaciones WHERE periodo_id = ?", [p.id]);
+  const [a] = await q("SELECT COUNT(*) AS n FROM alumnos WHERE estatus = 'ACTIVO'");
+  const areasBase = await q("SELECT id, nombre FROM inst_areas ORDER BY orden");
+  const vista = await q("SELECT area_id, evaluaciones, promedio, nivel FROM v_inst_area WHERE periodo_id = ?", [p.id]);
+  res.json({
+    periodo_id: p.id, periodo: p.nombre, evaluaciones: t.evaluaciones, alumnos_activos: a.n,
+    participacion_pct: a.n ? Math.round(1000 * t.evaluaciones / a.n) / 10 : 0,
+    promedio: t.promedio, nivel: nivelDe(t.promedio), ventana: await ventanaDe(p.id),
+    areas: areasBase.map(x => { const v = vista.find(y => y.area_id === x.id); return { area: x.nombre, promedio: v?.promedio ?? null, nivel: v?.nivel || "Sin evaluaciones" }; }),
+    criterios: await q("SELECT area, texto, respuestas, promedio FROM v_inst_criterio WHERE periodo_id = ? ORDER BY orden", [p.id]),
+    comentarios: await q(`SELECT comentario, DATE_FORMAT(fecha_hora,'%d/%m/%Y') AS fecha FROM inst_evaluaciones
+      WHERE periodo_id = ? AND comentario IS NOT NULL ORDER BY id DESC LIMIT 200`, [p.id])
+  });
+}));
+
 /* ---------- errores ---------- */
 app.use("/api", (req, res) => res.status(404).json({ error: "Ruta no encontrada" }));
 app.use((err, req, res, next) => {

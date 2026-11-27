@@ -30,20 +30,21 @@ CREATE TABLE eval_ventanas (
   FOREIGN KEY (periodo_id) REFERENCES periodos(id)
 );
 
--- 3. Una evaluación por inscripción (alumno + grupo): no se puede evaluar dos veces
+-- 3. Una evaluación por alumno, docente y periodo: si el docente da varias materias,
+--    el alumno lo evalúa UNA sola vez (la UNIQUE lo garantiza aunque falle la API)
 CREATE TABLE eval_evaluaciones (
-  id             INT PRIMARY KEY AUTO_INCREMENT,
-  inscripcion_id INT NOT NULL UNIQUE,
-  grupo_id       INT NOT NULL,
-  docente_id     INT NOT NULL,
-  comentario     VARCHAR(500) NULL,
-  promedio       DECIMAL(3,2) NULL,              -- lo calcula el servidor
-  fecha_hora     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (inscripcion_id) REFERENCES inscripciones(id),
-  FOREIGN KEY (grupo_id)       REFERENCES grupos(id),
-  FOREIGN KEY (docente_id)     REFERENCES docentes(id),
-  INDEX idx_eval_docente (docente_id),
-  INDEX idx_eval_grupo (grupo_id)
+  id         INT PRIMARY KEY AUTO_INCREMENT,
+  alumno_id  INT NOT NULL,
+  docente_id INT NOT NULL,
+  periodo_id INT NOT NULL,
+  comentario VARCHAR(500) NULL,
+  promedio   DECIMAL(3,2) NULL,                 -- lo calcula el servidor
+  fecha_hora DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE (alumno_id, docente_id, periodo_id),
+  FOREIGN KEY (alumno_id)  REFERENCES alumnos(id),
+  FOREIGN KEY (docente_id) REFERENCES docentes(id),
+  FOREIGN KEY (periodo_id) REFERENCES periodos(id),
+  INDEX idx_eval_docente (docente_id, periodo_id)
 );
 
 -- 4. Respuesta de 1 a 5 por cada criterio
@@ -57,27 +58,31 @@ CREATE TABLE eval_respuestas (
   FOREIGN KEY (criterio_id)   REFERENCES eval_criterios(id)
 );
 
--- 5. Vista: resultado automático por docente y grupo (promedio, participación, nivel)
+-- 5. Vista: resultado automático por docente y periodo (todas sus materias juntas)
 CREATE VIEW v_eval_docente AS
-SELECT pe.nombre AS periodo,
-       d.id AS docente_id, d.nombre AS docente,
-       g.id AS grupo_id, g.clave AS grupo, m.nombre AS materia,
-       (SELECT COUNT(*) FROM inscripciones i WHERE i.grupo_id = g.id AND i.estatus='INSCRITO') AS inscritos,
-       COUNT(e.id) AS evaluaciones,
-       ROUND(100 * COUNT(e.id) /
-             NULLIF((SELECT COUNT(*) FROM inscripciones i WHERE i.grupo_id = g.id AND i.estatus='INSCRITO'),0), 1) AS participacion_pct,
-       ROUND(AVG(e.promedio), 2) AS promedio,
-       CASE WHEN COUNT(e.id) = 0 THEN 'Sin evaluaciones'
-            WHEN AVG(e.promedio) >= 4.5 THEN 'Excelente'
-            WHEN AVG(e.promedio) >= 4.0 THEN 'Bueno'
-            WHEN AVG(e.promedio) >= 3.0 THEN 'Regular'
+SELECT x.*,
+       ROUND(100 * x.evaluaciones / NULLIF(x.inscritos, 0), 1) AS participacion_pct,
+       CASE WHEN x.evaluaciones = 0 THEN 'Sin evaluaciones'
+            WHEN x.promedio >= 4.5 THEN 'Excelente'
+            WHEN x.promedio >= 4.0 THEN 'Bueno'
+            WHEN x.promedio >= 3.0 THEN 'Regular'
             ELSE 'Requiere atención' END AS nivel
-  FROM grupos g
-  JOIN docentes d ON d.id = g.docente_id
-  JOIN materias m ON m.id = g.materia_id
-  JOIN periodos pe ON pe.id = g.periodo_id
-  LEFT JOIN eval_evaluaciones e ON e.grupo_id = g.id
- GROUP BY pe.nombre, d.id, d.nombre, g.id, g.clave, m.nombre;
+  FROM (
+    SELECT pe.id AS periodo_id, pe.nombre AS periodo, d.id AS docente_id, d.nombre AS docente,
+           (SELECT GROUP_CONCAT(DISTINCT m.nombre ORDER BY m.nombre SEPARATOR ', ')
+              FROM grupos g2 JOIN materias m ON m.id = g2.materia_id
+             WHERE g2.docente_id = d.id AND g2.periodo_id = pe.id) AS materias,
+           (SELECT COUNT(DISTINCT i.alumno_id)
+              FROM inscripciones i JOIN grupos g3 ON g3.id = i.grupo_id
+             WHERE g3.docente_id = d.id AND g3.periodo_id = pe.id AND i.estatus = 'INSCRITO') AS inscritos,
+           COUNT(e.id) AS evaluaciones,
+           ROUND(AVG(e.promedio), 2) AS promedio
+      FROM (SELECT DISTINCT docente_id, periodo_id FROM grupos) gp
+      JOIN docentes d ON d.id = gp.docente_id
+      JOIN periodos pe ON pe.id = gp.periodo_id
+      LEFT JOIN eval_evaluaciones e ON e.docente_id = d.id AND e.periodo_id = pe.id
+     GROUP BY pe.id, pe.nombre, d.id, d.nombre
+  ) x;
 
 -- 6. Vista: promedio por criterio y docente (para ver en qué falla o destaca)
 CREATE VIEW v_eval_criterio_docente AS
@@ -104,10 +109,9 @@ INSERT INTO eval_criterios (categoria, texto, orden) VALUES
 INSERT INTO eval_ventanas (periodo_id, fecha_apertura, fecha_cierre)
 SELECT id, '2026-11-02', '2026-12-04' FROM periodos WHERE nombre = 'Otoño 2026';
 
--- Evaluación de ejemplo: solo la inscripción 2 (la 1 queda pendiente para la demostración)
-INSERT INTO eval_evaluaciones (inscripcion_id, grupo_id, docente_id, comentario, promedio)
-SELECT i.id, i.grupo_id, g.docente_id, 'Explica muy claro y resuelve dudas.', NULL
-  FROM inscripciones i JOIN grupos g ON g.id = i.grupo_id WHERE i.id = 2;
+-- Evaluación de ejemplo: el alumno 2 evalúa a la docente 1 (la alumna 1 queda pendiente para la demostración)
+INSERT INTO eval_evaluaciones (alumno_id, docente_id, periodo_id, comentario, promedio)
+VALUES (2, 1, 1, 'Explica muy claro y resuelve dudas.', NULL);
 
 INSERT INTO eval_respuestas (evaluacion_id, criterio_id, puntaje)
 SELECT 1, id, CASE WHEN id % 3 = 0 THEN 4 ELSE 5 END FROM eval_criterios;
@@ -117,4 +121,4 @@ UPDATE eval_evaluaciones
  WHERE id = 1;
 
 -- Comprobación
-SELECT * FROM v_eval_docente WHERE grupo = 'BD701';
+SELECT * FROM v_eval_docente;

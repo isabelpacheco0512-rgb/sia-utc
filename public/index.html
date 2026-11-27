@@ -130,7 +130,7 @@ const perAct=()=>db.periodos.at(-1);
 const insPer=p=>db.inscripciones.filter(i=>i.estatus=="INSCRITO"&&by("grupos",i.grupo_id).periodo_id==p);
 const tabla=(h,b)=>`<div class="tarjeta tabla"><table><thead><tr>${L(h,x=>`<th>${x}</th>`)}</tr></thead><tbody>${b}</tbody></table></div>`;
 const cab=(t,s,x="")=>`<div class="cabecera"><div><h2>${t}</h2><div class="sub">${s}</div></div>${x}</div>`;
-const NAV={ADMIN:[["panel","Panel"],["evaluacion","Evaluación docente"],["alumnos","Alumnos"],["inscripciones","Inscripciones"],["calificaciones","Calificaciones"],["horarios","Horarios"],["cargas","Cargas académicas"],["reportes","Reportes"],["catalogos","Catálogos"],["bitacora","Bitácora"]],DOCENTE:[["panel","Panel"],["evaluacion","Mi evaluación"],["calificaciones","Calificaciones"],["horarios","Horarios"]],ALUMNO:[["panel","Panel"],["evaluacion","Evaluación docente"],["calificaciones","Calificaciones"],["horarios","Horarios"]]};
+const NAV={ADMIN:[["panel","Panel"],["evaluacion","Evaluación docente"],["instalaciones","Instalaciones"],["alumnos","Alumnos"],["inscripciones","Inscripciones"],["calificaciones","Calificaciones"],["horarios","Horarios"],["cargas","Cargas académicas"],["reportes","Reportes"],["catalogos","Catálogos"],["bitacora","Bitácora"]],DOCENTE:[["panel","Panel"],["evaluacion","Mi evaluación"],["calificaciones","Calificaciones"],["horarios","Horarios"]],ALUMNO:[["panel","Panel"],["evaluacion","Evaluación docente"],["instalaciones","Instalaciones y servicios"],["calificaciones","Calificaciones"],["horarios","Horarios"]]};
 const V={},H={},act={},ch={},sub={};
 function ir(id){cur=id;document.querySelectorAll("nav button").forEach(b=>b.dataset.ir==id?b.setAttribute("aria-current","page"):b.removeAttribute("aria-current"));$("#main").innerHTML=V[id]();H[id]&&H[id]()}
 function abrir(h,ancho){$("#dlg").classList.toggle("ancho",!!ancho);$("#dlg").innerHTML=h;$("#dlg").showModal()}
@@ -295,6 +295,40 @@ else if(S.rol=="ADMIN"){const r=await api("evaluaciones/resultados"),tot=r.reduc
 t="Evaluación docente";c=`Participación <b>${ins?Math.round(tot*100/ins):0}%</b> (${tot} de ${ins}) · promedio general <b>${f2(pg)}</b> · docentes que requieren atención: <b>${at}</b>`;b="Ver resultados"}
 else{const d=await api("evaluaciones/mi-resultado");t="Mi evaluación docente";c=`Mi promedio: <b>${f2(d.promedio)}</b> · ${d.evaluaciones} evaluación${d.evaluaciones==1?"":"es"} · nivel <b>${esc(d.nivel)}</b>`;b="Ver detalle"}
 box.innerHTML=`<div class="tarjeta"><div class="cabecera" style="border:0;padding:0"><div><h3 style="margin:0 0 6px">${t}</h3><div>${c}</div></div>${b?`<button class="btn" data-a="irEv">${b}</button>`:""}</div></div>`});
+/* EVALUACIÓN DE INSTALACIONES Y SERVICIOS */
+const IN={e:null,c:null,r:null};
+V.instalaciones=()=>S.rol=="ALUMNO"?cab("Instalaciones y servicios","Califica las aulas, la biblioteca, las áreas comunes y los servicios escolares · es anónimo")+`<div id="inBox" class="mt"><p class="sub">Cargando…</p></div>`
+ :cab("Evaluación de instalaciones","Resultados automáticos por área · las respuestas son anónimas",`<button class="btn sec" data-a="csvIn">Exportar CSV</button>`)+`<div id="inBox" class="mt"><p class="sub">Cargando resultados…</p></div>`;
+H.instalaciones=()=>S.rol=="ALUMNO"?H.inAl():S.rol=="ADMIN"?H.inAd():null;
+H.inAl=()=>run(async()=>{const e=IN.e=await api("instalaciones/estado"),v=e.ventana;
+$("#inBox").innerHTML=!e.periodo?`<div class="tarjeta"><p>No hay un periodo escolar activo.</p></div>`:
+`<div class="tarjeta"><h3>Periodo ${esc(e.periodo)}</h3><p style="margin:0 0 12px">Tu opinión nos ayuda a mejorar <b>4 áreas</b>: aulas y laboratorios, biblioteca e internet, baños, cafetería y áreas comunes, y servicios escolares. Son 12 preguntas y se contesta una sola vez por periodo.</p>
+<div class="sub">${v?`Disponible del ${fch(v.fecha_apertura)} al ${fch(v.fecha_cierre)}`:"Aún no hay fechas de evaluación"}</div>
+<div class="evpie">${e.evaluada?'<span class="chip">Evaluada · ¡gracias!</span>':e.puede_evaluar?'<span class="aviso">Pendiente</span>':'<span class="chip baja">'+(v?"Fuera de fecha":"No habilitada")+"</span>"}${e.puede_evaluar?`<button class="btn" data-a="evaluarIn">Evaluar instalaciones</button>`:""}</div></div>`});
+act.evaluarIn=()=>{const e=IN.e;if(!e||!e.puede_evaluar)return aviso("Esta evaluación no está disponible.");
+run(async()=>{IN.c=IN.c||await api("instalaciones/criterios");let k=0;
+abrir(`<form class="fm" data-f="inst" novalidate><h3>Instalaciones y servicios · ${esc(e.periodo)}</h3><p class="sub" style="margin:0">Escala: 1 = muy malo, 5 = excelente. Tus respuestas no se asocian a tu nombre.</p>
+${L(IN.c,a=>`<h3 style="margin:14px 0 0;color:var(--azul-fuerte)">${esc(a.nombre)}</h3>${L(a.criterios,c=>`<fieldset class="preg"><legend>${++k}. ${esc(c.texto)}</legend><div class="esc">${[1,2,3,4,5].map(n=>`<label class="op"><input type="radio" name="i${c.id}" value="${n}"><span>${n}</span></label>`).join("")}</div></fieldset>`)}`)}
+<label>Comentario (opcional)<textarea name="comentario" maxlength="500" rows="3" placeholder="¿Qué deberíamos mejorar primero?"></textarea></label>
+<p class="err" id="inError" role="alert"></p><div class="filtros"><button class="btn">Enviar evaluación</button><button type="button" class="btn sec" data-a="cerrar">Cancelar</button></div></form>`,1)})};
+sub.inst=f=>run(async()=>{const cs=IN.c.flatMap(a=>a.criterios),resp=cs.map(c=>{const r=f.querySelector(`input[name=i${c.id}]:checked`);return r?{criterio_id:c.id,puntaje:+r.value}:null});
+if(resp.some(x=>!x))throw new Error("Contesta las "+cs.length+" preguntas para enviar tu evaluación.");
+const r=await api("instalaciones","POST",{periodo_id:IN.e.periodo_id,respuestas:resp,comentario:f.comentario.value});act.cerrar();aviso(r.mensaje);H.inAl()},"#inError");
+H.inAd=()=>run(async()=>{const r=IN.r=await api("instalaciones/resultados");if(!r.periodo){$("#inBox").innerHTML=`<div class="tarjeta"><p>No hay un periodo escolar activo.</p></div>`;return}
+const aten=r.areas.filter(a=>a.nivel=="Requiere atención"||a.nivel=="Regular").length,v=r.ventana;
+$("#inBox").innerHTML=`<p class="sub" style="margin-top:0">Periodo ${esc(r.periodo)}${v?` · ventana del ${fch(v.fecha_apertura)} al ${fch(v.fecha_cierre)} (la misma de la evaluación docente)`:""}</p>
+<div class="kpis" style="margin-top:0">${L([["Promedio general",f2(r.promedio)+(r.promedio==null?"":" / 5")],["Evaluaciones",r.evaluaciones+" de "+r.alumnos_activos],["Participación",r.participacion_pct+"%"],["Áreas por mejorar",aten]],x=>`<div class="kpi"><span>${x[0]}</span><b>${x[1]}</b></div>`)}</div>
+<div class="dos"><div class="tarjeta"><h3>Resultado por área</h3>${L(r.areas,a=>`<div class="barra"><div><span>${esc(a.area)}</span><b>${f2(a.promedio)} ${nivChip(a.nivel)}</b></div><div class="pista"><i style="width:${a.promedio==null?0:Math.round(a.promedio*20)}%"></i></div></div>`)}</div>
+<div class="tarjeta"><h3>Comentarios anónimos</h3><ul class="lista">${L(r.comentarios,c=>`<li>${esc(c.comentario)}<div class="sub">${esc(c.fecha)}</div></li>`)||"<li>Aún no hay comentarios.</li>"}</ul></div></div>
+<h3 class="mt">Detalle por pregunta</h3>`+tabla(["Área","Pregunta","Respuestas","Promedio"],L(r.criterios,c=>`<tr><td>${esc(c.area)}</td><td>${esc(c.texto)}</td><td>${c.respuestas}</td><td><b>${f2(c.promedio)}</b></td></tr>`)||`<tr><td colspan="4">Sin respuestas todavía</td></tr>`)});
+act.csvIn=()=>{if(!puede("ADMIN")||!IN.r)return;const t=[["Periodo","Área","Pregunta","Respuestas","Promedio"],...IN.r.criterios.map(c=>[IN.r.periodo,c.area,c.texto,c.respuestas,c.promedio])].map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(",")).join("\r\n"),a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["﻿"+t],{type:"text/csv"}));a.download="evaluacion_instalaciones_sia.csv";a.click()};
+/* Panel: tarjeta de instalaciones para alumno y administrador */
+const vPanel2=V.panel;V.panel=()=>vPanel2()+(S.rol=="DOCENTE"?"":`<div id="inPanel" class="mt"></div>`);
+const hPanel=H.panel;act.irIn=()=>ir("instalaciones");
+H.panel=()=>{hPanel();if(S.rol=="DOCENTE")return;run(async()=>{const box=$("#inPanel");if(!box)return;let c,b;
+if(S.rol=="ALUMNO"){const e=await api("instalaciones/estado");c=e.puede_evaluar?"Ayúdanos a mejorar las aulas, la biblioteca, las áreas comunes y los servicios escolares. Son 12 preguntas.":e.evaluada?"Ya evaluaste las instalaciones de este periodo. ¡Gracias!":"La evaluación de instalaciones no está disponible por ahora.";b=e.puede_evaluar?"Evaluar instalaciones":""}
+else{const r=await api("instalaciones/resultados");c=r.periodo?`Promedio general <b>${f2(r.promedio)}</b> · participación <b>${r.participacion_pct}%</b> (${r.evaluaciones} de ${r.alumnos_activos} alumnos)`:"Sin periodo activo";b="Ver resultados"}
+box.innerHTML=`<div class="tarjeta"><div class="cabecera" style="border:0;padding:0"><div><h3 style="margin:0 0 6px">Instalaciones y servicios</h3><div>${c}</div></div>${b?`<button class="btn" data-a="irIn">${b}</button>`:""}</div></div>`})};
 /* SESIÓN, TEMA Y EVENTOS */
 sub.login=async()=>{const v=$("#usuario").value.trim(),p=$("#clave").value,e=$("#loginError");e.style.color="";
 if(!v||!p){e.textContent="Escribe tu usuario y tu contraseña para continuar.";return}
